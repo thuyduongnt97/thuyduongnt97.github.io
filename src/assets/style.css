@@ -392,8 +392,17 @@ section { padding-block: clamp(4.5rem, 9vw, 7.5rem); position: relative; }
 .tl-head__eyebrow { display: block; font-family: var(--font-mono); color: var(--cyan); font-size: .76rem; margin-bottom: .4rem; }
 .tl-head__role { color: var(--text-muted); font-size: .9rem; margin-top: .25rem; }
 .tl-head--university h3 { max-width: 38ch; font-size: 1.2rem; line-height: 1.4; }
-.experience-stage__note { margin: 1.4rem 0 0 2.6rem; padding: 1rem 1.2rem; border-left: 2px solid var(--border-strong); color: var(--text-muted); font-size: .9rem; }
-.experience-stage__note-period { display: inline-flex; align-items: center; gap: .5rem; color: var(--text); font-size: .8rem; font-family: var(--font-mono); margin-bottom: .4rem; }
+.tl-item--foundation { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 1.8rem; background: linear-gradient(115deg, hsl(187 92% 55% / .05), transparent 65%), var(--surface); }
+.tl-item--foundation::after { border-color: var(--cyan); box-shadow: 0 0 0 5px hsl(187 92% 55% / .1); }
+.foundation-period { padding-right: 1.8rem; border-right: 1px solid var(--border-strong); }
+.foundation-period__label { display: block; margin-bottom: .65rem; color: var(--cyan); font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+.foundation-period__dates { display: flex; align-items: center; gap: .45rem; color: var(--text); font-family: var(--font-mono); font-size: .82rem; white-space: nowrap; }
+.foundation-period__dates .icon { color: var(--text-muted); flex-shrink: 0; }
+.foundation-content { min-width: 0; }
+.foundation-content__description { margin-top: .55rem; max-width: 68ch; }
+.foundation-insight { display: flex; align-items: flex-start; gap: .6rem; margin-top: 1rem; padding-top: .85rem; border-top: 1px solid var(--border); }
+.foundation-insight .icon { flex-shrink: 0; margin-top: .18rem; color: var(--cyan); }
+.foundation-insight p { font-size: .88rem; line-height: 1.6; }
 
 /* ---------- Projects ---------- */
 .projects { display: grid; gap: 1.5rem; }
@@ -488,6 +497,8 @@ section { padding-block: clamp(4.5rem, 9vw, 7.5rem); position: relative; }
 
 @media (max-width: 760px) {
   .skills__grid { grid-template-columns: 1fr; }
+  .tl-item--foundation { grid-template-columns: 1fr; gap: 1.15rem; }
+  .foundation-period { padding: 0 0 1rem; border-right: 0; border-bottom: 1px solid var(--border); }
 }
 
 @media (max-width: 640px) {
@@ -503,7 +514,6 @@ section { padding-block: clamp(4.5rem, 9vw, 7.5rem); position: relative; }
   .timeline::before { left: 8px; }
   .tl-item { padding: 1.4rem 1.3rem; }
   .tl-item::after { left: calc(-2rem + 0px); width: 16px; height: 16px; top: 1.8rem; }
-  .experience-stage__note { margin-left: 2rem; padding-inline: .8rem; }
   .working-principles { padding: 1.4rem; gap: 1rem; }
   .hero__cta .btn { flex: 1 1 100%; }
 }

@@ -68,12 +68,27 @@ import { profile } from '../data/profile'
               <span v-for="t in item.tech" :key="t" class="chip">{{ t }}</span>
             </div>
           </article>
-        </div>
 
-        <aside v-reveal class="experience-stage__note">
-          <span class="experience-stage__note-period"><BaseIcon name="calendar" /> {{ universityExperience.earlierSupport.period }}</span>
-          <p>{{ universityExperience.earlierSupport.text }}</p>
-        </aside>
+          <article v-reveal class="card tl-item tl-item--foundation" aria-labelledby="foundation-title">
+            <div class="foundation-period">
+              <span class="foundation-period__label">{{ universityExperience.earlierSupport.stageLabel }}</span>
+              <div class="foundation-period__dates">
+                <BaseIcon name="calendar" />
+                <time :datetime="universityExperience.earlierSupport.start.date">{{ universityExperience.earlierSupport.start.label }}</time>
+                <span>–</span>
+                <time :datetime="universityExperience.earlierSupport.end.date">{{ universityExperience.earlierSupport.end.label }}</time>
+              </div>
+            </div>
+            <div class="foundation-content">
+              <h4 id="foundation-title" class="tl-item__title">{{ universityExperience.earlierSupport.title }}</h4>
+              <p class="foundation-content__description">{{ universityExperience.earlierSupport.description }}</p>
+              <div class="foundation-insight">
+                <BaseIcon name="compass" />
+                <p>{{ universityExperience.earlierSupport.takeaway }}</p>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>

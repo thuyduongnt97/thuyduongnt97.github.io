@@ -70,7 +70,11 @@ export const universityExperience = {
     },
   ],
   earlierSupport: {
-    period: '07/2016 – 09/2018',
-    text: 'Tham gia hỗ trợ nghiệp vụ tuyển sinh, nhập liệu và xử lý thủ tục xét tuyển/nhập học cho sinh viên. Trải nghiệm thực tế này tạo nền tảng hiểu nghiệp vụ trước khi phát triển các hệ thống phần mềm của trường.',
+    stageLabel: 'Giai đoạn nền tảng',
+    title: 'Hỗ trợ nghiệp vụ tuyển sinh',
+    start: { date: '2016-07', label: '07/2016' },
+    end: { date: '2018-09', label: '09/2018' },
+    description: 'Hỗ trợ tuyển sinh, nhập liệu và xử lý thủ tục xét tuyển, nhập học cho sinh viên.',
+    takeaway: 'Hiểu nghiệp vụ thực tế trước khi phát triển hệ thống phần mềm của trường.',
   },
 }
