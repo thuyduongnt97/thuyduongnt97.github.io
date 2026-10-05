@@ -2,7 +2,7 @@
 
 Chào mừng bạn đến với kho lưu trữ mã nguồn website cá nhân của mình, được xây dựng và lưu trữ miễn phí thông qua **GitHub Pages**.
 
-🔗 **Xem trực tiếp tại:** [thuyduongnt97.github.io](thuyduongnt97.github.io)
+🔗 **Xem trực tiếp tại:** [https://thuyduongnt97.github.io](https://thuyduongnt97.github.io)
 
 ---
 
