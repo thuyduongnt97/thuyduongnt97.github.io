@@ -16,12 +16,12 @@ const hasVersions = (demo) => Boolean(demo.desktopEntry && demo.mobileEntry)
         eyebrow="Showcase — Sản phẩm đã thực hiện"
         title="Interactive demo &amp; Landing page"
         title-id="showcase-title"
-        sub="Khám phá các website mình đã làm và trải nghiệm những demo tương tác."
+        sub="Đây là một số landing page và demo tương tác tiêu biểu mình đã thực hiện. Nội dung được chọn lọc để chia sẻ công khai, đồng thời tôn trọng các yêu cầu bảo mật thông tin của công ty."
       />
 
       <div class="showcase-group" aria-labelledby="landing-title">
         <div class="showcase-group__head">
-          <h3 id="landing-title">Landing page đã thực hiện</h3>
+          <h3 id="landing-title">Landing page tiêu biểu</h3>
           <span class="showcase-count">{{ landingPages.length }} website</span>
         </div>
         <div class="showcase-grid">
