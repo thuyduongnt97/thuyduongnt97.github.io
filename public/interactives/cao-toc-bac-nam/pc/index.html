@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="../../device-route.js" data-desktop="../pc/index.html" data-mobile="../mb/index.html"></script>
+        <title>Cao tốc Bắc – Nam · Máy tính</title>
+        <link rel="stylesheet" href="./css/fonts.css">
+        <script src="./js/dataJson.js"></script>
+        <link href="./css/mapsvg.css" rel="stylesheet">
+        <link href="./css/nxanoscroller.css" rel="stylesheet">
+        <script src="./js/jquery.js"></script>
+        <script src="./js/jquery.mousewheel.min.js"></script>
+        <script src="./js/jquery.nanoscroller.min.js"></script>
+        <script src="./js/mapsvg.min.js"></script>
+        <script src="./js/chart.js"></script>
+        <script src="./js/chartjs-plugin-datalabels@2.0.0.js"></script>
+        <script src="./js/TweenMask.js"></script>
+        <script src="./js/Draggable.min.js"></script>
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+    <body>
+        <div class="header">
+            <div class="header__top-middle">
+                <div class="container">
+                    <div class="header__top-flex">
+                        <a href="https://www.baogiaothong.vn" class="logo" title="Báo giao thông">
+                            <h1>
+                                <img src="https://static.mediacdn.vn/baogiaothong.vn/image/logo.png" alt="Báo giao thông" class="logo-img">
+                            </h1>
+                        </a>
+        
+                    </div>
+                </div>
+            </div>
+            <div class="header__menu-box">
+                <div class="container">
+                    <div class="header__menu-list">
+                        <a href="https://www.baogiaothong.vn" class="menu-item active" title="Trang chủ">
+                            <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1746_1487)">
+                                    <path d="M17.1216 8.29796C17.4258 7.95564 17.3932 7.42815 17.0564 7.12512L9.60856 0.391109C9.27175 0.0880789 8.72851 0.0936906 8.39713 0.407944L0.927554 7.48426C0.596177 7.79852 0.579879 8.3204 0.889527 8.6571L1.07423 8.85912C1.38388 9.19582 1.88909 9.23511 2.19331 8.94891L2.75285 8.43264V15.9916C2.75285 16.4573 3.11682 16.8333 3.56771 16.8333H6.47949C6.93038 16.8333 7.29435 16.4573 7.29435 15.9916V10.6998H11.0101V15.9916C11.0047 16.4573 11.3252 16.8333 11.7761 16.8333H14.8617C15.3126 16.8333 15.6766 16.4573 15.6766 15.9916V8.53365C15.6766 8.53365 15.8287 8.67394 16.0188 8.8479C16.209 9.02186 16.6055 8.88157 16.9097 8.53926L17.1216 8.29796Z" fill="#282828"></path>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1746_1487">
+                                        <rect width="16.6667" height="16.6667" fill="white" transform="translate(0.666748 0.166626)"></rect>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a>
+                        <a href="https://www.baogiaothong.vn/thoi-su.htm" class="menu-item" title="Thời sự">Thời sự</a>
+                        <a href="https://www.baogiaothong.vn/giao-thong.htm" class="menu-item" title="Giao thông">Giao thông</a>
+                        <a href="https://www.baogiaothong.vn/kinh-te.htm" class="menu-item" title="Kinh tế">Kinh tế</a>
+                        <a href="https://www.baogiaothong.vn/chat-luong-song.htm" class="menu-item" title="Chất lượng sống">Chất lượng sống</a>
+                        <a href="https://www.baogiaothong.vn/phap-luat.htm" class="menu-item" title="Pháp luật">Pháp luật</a>
+                        <a href="https://www.baogiaothong.vn/van-hoa-giai-tri.htm" class="menu-item" title="Văn hóa - Giải trí">Văn hóa - Giải trí</a>
+                        <a href="https://www.baogiaothong.vn/the-thao.htm" class="menu-item" title="Thể thao">Thể thao</a>
+                        <a href="https://www.baogiaothong.vn/cong-nghe.htm" class="menu-item" title="Công nghệ">Công nghệ</a>
+                        <a href="https://www.baogiaothong.vn/the-gioi.htm" class="menu-item" title="Thế giới">Thế giới</a>
+                        <a href="https://www.baogiaothong.vn/di.htm" class="menu-item" title="Đi ++">Đi ++</a>
+                        <a href="https://www.baogiaothong.vn/video.htm" class="menu-item" title="Video">Video</a>
+                        <a href="https://www.baogiaothong.vn/multimedia.htm" class="menu-item" title="Multimedia">Multimedia</a>
+        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <img src="./images/anhcoverPC.png" alt="" style="width: 100%;">
+        <div class="content">
+            <div class="bodyArt content-body">
+                <p>
+                    Hành lang vận tải trên trục Bắc - Nam có vai trò rất quan trọng khi đi qua 32 tỉnh, thành phố, tác động đến hơn 62% dân số, đóng góp gần 66% tổng sản phẩm trong nước, kết nối 4 vùng kinh tế trọng điểm là Bắc Bộ, miền Trung, phía Nam và đồng bằng sông Cửu Long. 
+                </p>
+                <p>
+                    Tuyến đường bộ cao tốc Bắc - Nam có tổng chiều dài hơn 2.000 km. Tính đến cuối năm 2021 (thời điểm Bộ GTVT báo cáo Chính phủ chủ trương đầu), có 756 km cao tốc chưa được đầu tư nên việc khai thác chưa đảm bảo tính đồng bộ, chưa phát huy hiệu quả.
+                </p>
+                <p>
+                    Tuyến quốc lộ đã được mở rộng từ Lạng Sơn đến Cà Mau nhưng chỉ cơ bản đáp ứng nhu cầu vận tải giai đoạn trước mắt. Với đặc điểm đi qua nhiều khu đông dân cư (chiếm gần 49% tổng chiều dài), lưu thông hỗn hợp nên quốc lộ 1 chỉ có ưu thế vận tải cự ly ngắn, tính chất nội vùng. 
+                </p>
+                <p>
+                    Thực tế trên cho thấy việc sớm đầu tư hoàn thành, đưa vào khai thác đồng bộ tuyến cao tốc Bắc - Nam phía đông là nhu cầu cấp thiết để tạo động lực phát triển kinh tế - xã hội.
+                </p>
+            </div>
+        </div>
+       
+        <div id="mapsvg"></div>
+        <div class="thanh-ngang" style="border-top: 0.2px solid #dbdbdb; width: 100%;height: 1px;"></div>
+        <div class="content">
+            <div class="bodyArt content-body">
+                <p>
+                    Với quyết tâm thực hiện thành công mục tiêu Đại hội Đảng XIII đề ra về đột phá kết cấu hạ tầng, phấn đấu cả nước có 3.000 km đường bộ cao tốc vào năm 2025, có 5.000 km vào năm 2030. Thời gian qua, hàng loạt cơ chế đặc thù đã được Quốc hội, Chính phủ cho phép áp dụng triển khai để bứt tốc tiến độ dự án như: cho phép chỉ định thầu xây lắp; cho phép triển khai đồng thời các thủ tục để rút ngắn thời gian thực hiện các công việc liên quan đến đánh giá tác động môi trường, khung chính sách bồi thường, hỗ trợ, tái định cư; giao mỏ vật liệu cho nhà thầu khai thác trực tiếp… 
+                </p>
+                <p>
+                    Nhờ đó, chỉ trong nửa nhiệm kỳ vừa qua (2021-2023), ngành giao thông đã tạo ra sự đột phá trong phát triển kết cấu hạ tầng. Nếu giai đoạn 2001-2010, cả nước chỉ đưa vào khai thác được 89 km đường cao tốc; giai đoạn 2011-2020 đưa vào khai thác thêm 1.074 km thì chỉ trong nửa nhiệm kỳ qua, gần 600 km đường cao tốc đã được đưa vào khai thác, nâng tổng số đường cao tốc của nước ta đến nay lên 1.729 km. 
+                </p>
+            </div>
+            <div id="bieudo" style="margin: 30px auto;">
+                <div class="fl-legend-item top5-dau-tu" style="display: inline-flex; align-items: center; padding-inline: 0px 0.5rem; text-align: start;">
+                    <div class="fl-legend-swatch" style="height: 1.1rem; width: 0.95rem; border-radius: 3px; background-color: rgb(29, 105, 150);"></div>
+                    <svg class="fl-legend-icon fl-ignore-svg-download" height="14" width="0" style="display: none;">
+                        <path style="fill: rgb(29, 105, 150); stroke: none; stroke-width: 0;">
+                        </path>
+                    </svg>
+                    <span class="fl-legend-label" style="line-height: 27px; margin: 0px; user-select: none; padding-inline: 0.2em 0px; font-weight: normal; font-size: 1.3rem; border: 0.5px solid #00000014; border-radius: 20px;" >
+                        TOP 5 DỰ ÁN CÓ MỨC ĐẦU TƯ LỚN NHẤT
+                    </span>
+                </div>
+                <div class="fl-legend-item top5-dai-nhat" style="display: inline-flex; align-items: center; padding-inline: 0px 0.5rem; text-align: start;">
+                    <div class="fl-legend-swatch" style="height: 1.1rem; width: 0.95rem; border-radius: 3px; background-color: #62b08f;">
+                    </div>
+                    <svg class="fl-legend-icon fl-ignore-svg-download" height="14" width="0" style="display: none;"><path style="fill: #62b08f; stroke: none; stroke-width: 0;"></path>
+                    </svg>
+                    <span class="fl-legend-label" style="line-height: 27px; margin: 0px; user-select: none; padding-inline: 0.2em 0px; font-weight: normal; font-size: 1.3rem;border: 0.5px solid #00000014; border-radius: 20px;">
+                        TOP 5 DỰ ÁN DÀI NHẤT
+                    </span>
+                </div>
+                <div id="artChart" style="height: auto; width: 100%;">
+                    <canvas id="ChartTopMucDauTu"></canvas>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <p>
+                        Chỉ trong 3 năm, chiều dài đường cao tốc hoàn thành bằng 1/2 số km đường cao tốc triển khai trong 10 năm trước. Đó là kết quả đến từ quyết tâm biến không thành có, biến khó thành dễ và đổi mới tư duy, phân bổ nguồn lực, tháo gỡ vướng mắc về cơ chế chính sách.
+                    </p>
+                    <p>
+                        Ngoài tranh thủ thời tiết, tăng cả đẩy nhanh tiến độ, các đơn vị liên quan đang nỗ lực giải phóng mặt bằng, tái định cư, hỗ trợ an sinh để cơ bản thông tuyến cáo tốc Bắc - Nam vào cuối năm 2025.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="container">
+                <div class="footer__top-flex">
+                    <a href="https://baogiaothong.vn" class="logo-ft" title="Báo giao thông - Tin tức trong ngày, tin mới nhất, tin nhanh 24h">
+                        <h1>
+                            <img src="https://static.mediacdn.vn/baogiaothong.vn/image/logo.png" alt="Báo giao thông - Tin tức trong ngày, tin mới nhất, tin nhanh 24h" class="logo-img">
+                        </h1>
+                    </a>
+        
+                    <div class="list-logo">
+                        <a href="https://xe.baogiaothong.vn/" class="item" title="Xe báo giao thông" rel="nofollow" target="_blank">
+                            <img src="https://static.mediacdn.vn/baogiaothong.vn/image/logo-ft1x2.png" alt="logo" width="137" height="44">
+                        </a>
+                        <a href="https://atgt.baogiaothong.vn/" class="item" title="An toàn giao thông" rel="nofollow" target="_blank">
+                            <img src="https://static.mediacdn.vn/baogiaothong.vn/image/logo-ft2x2.png" alt="logo" width="94" height="44">
+                        </a>
+                        <a href="https://www.facebook.com/giaothongonline" class="item" title="Facebook" rel="nofollow" target="_blank">
+                            <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="15.9998" cy="16.7865" r="13.3333" fill="#1877F2"></circle>
+                                <path d="M20.6342 21.2842L21.1871 17.692H17.7289V15.3609C17.7289 14.3781 18.2121 13.4201 19.7609 13.4201H21.3332V10.3619C21.3332 10.3619 19.9063 10.1191 18.5421 10.1191C15.694 10.1191 13.8324 11.8395 13.8324 14.9541V17.692H10.6665V21.2842H13.8324V29.9682C14.4673 30.0674 15.1178 30.1191 15.7807 30.1191C16.4436 30.1191 17.094 30.0674 17.7289 29.9682V21.2842H20.6342Z" fill="white"></path>
+                            </svg>
+                        </a>
+                        <a href="https://www.youtube.com/channel/UC9CbjDlw_c1KGH7t6XHyJ_Q" class="item" title="Youtube" rel="nofollow" target="_blank">
+                            <svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M27.4998 11.2843C27.2249 10.3025 26.4117 9.52795 25.377 9.2625C23.5062 8.78613 16 8.78613 16 8.78613C16 8.78613 8.49761 8.78613 6.62297 9.2625C5.59211 9.52431 4.77887 10.2989 4.50016 11.2843C4 13.0661 4 16.7861 4 16.7861C4 16.7861 4 20.5061 4.50016 22.288C4.77506 23.2698 5.58829 24.0443 6.62297 24.3098C8.49761 24.7861 16 24.7861 16 24.7861C16 24.7861 23.5062 24.7861 25.377 24.3098C26.4079 24.048 27.2211 23.2734 27.4998 22.288C28 20.5061 28 16.7861 28 16.7861C28 16.7861 28 13.0661 27.4998 11.2843Z" fill="#FF3000"></path>
+                                <path d="M13.6023 20.2152L19.8371 16.7861L13.6023 13.357V20.2152Z" fill="white"></path>
+                            </svg>
+                        </a>
+                        <a href="https://baogiaothong.vn/index.rss" class="item" title="Rss">
+                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1746_481)">
+                                    <path d="M27.3332 13.7761C27.3332 21.1719 21.3644 27.1198 13.9478 27.1198C6.63525 27.1198 0.666504 21.1198 0.666504 13.7761C0.666504 6.39068 6.6665 0.432346 14.0832 0.453179C21.3748 0.474013 27.3436 6.4636 27.3332 13.7761ZM7.03109 9.19276C13.4373 9.07818 18.7394 14.3698 18.604 20.7553C19.3853 20.7553 20.1769 20.7553 20.9582 20.7553C21.3853 12.6303 13.9269 6.22401 6.99984 6.88026C6.99984 7.56776 6.99984 8.26568 6.99984 8.95318C6.99984 9.0261 7.02067 9.10943 7.03109 9.19276ZM16.0415 20.7657C16.3436 15.474 11.604 11.349 7.03109 11.7657C7.03109 12.5469 7.03109 13.3386 7.03109 14.099C11.2082 14.3907 13.4061 16.6198 13.6873 20.7553C14.4582 20.7657 15.229 20.7657 16.0415 20.7657ZM9.0415 20.7865C10.1457 20.7969 11.0832 19.8594 11.0832 18.7344C11.0832 17.6094 10.1561 16.6407 9.06234 16.6407C7.99984 16.6407 7.06234 17.5782 7.0415 18.6823C7.01025 19.7969 7.93734 20.7761 9.0415 20.7865Z" fill="#FF8B03"></path>
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1746_481">
+                                        <rect width="26.6667" height="26.6667" fill="white" transform="translate(0.666504 0.453125)"></rect>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                        </a>
+                        <a href="https://www.baogiaothong.vn/60nam/" class="item-btn" title="Thông tin tòa soạn">Thông tin tòa soạn</a>
+                    </div>
+                </div>
+                <div class="footer__bottom-flex">
+                    <div class="footer__left">
+                        <p class="text1">Tổng biên tập:
+                            <span class="text2">Nguyễn Bá Kiên</span>
+                        </p>
+                        <p class="text1">Phó Tổng biên tập:
+                            <span class="text2">Nguyễn Thị Hồng Nga, Nguyễn Đức Thắng</span>
+                        </p>
+                        <p class="text1">Giấy phép số 522/GP-BTTTT cấp ngày 28/10/2022</p>
+                    </div>
+                    <div class="footer__right">
+                        <p class="text">
+                            Tòa soạn: Số 2, Nguyễn Công Hoan, Ba Đình, Hà Nội.
+                            <br>
+                            Hotline: 0901 514 799; Liên hệ quảng cáo phát hành: 0915.057.282
+                            <br>
+                            Email: <a href="mailto:bandoc@baogiaothong.vn" title="Gửi mail cho Báo giao thông">bandoc@baogiaothong.vn</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="./js/app.js"></script>
+    </body>
+</html>

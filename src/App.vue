@@ -5,6 +5,7 @@ import BackgroundFx from './components/BackgroundFx.vue'
 import AppNav from './components/AppNav.vue'
 import HeroSection from './components/HeroSection.vue'
 import MarqueeStrip from './components/MarqueeStrip.vue'
+import ShowcaseSection from './components/ShowcaseSection.vue'
 import AboutSection from './components/AboutSection.vue'
 import RecognitionSection from './components/RecognitionSection.vue'
 import SkillsSection from './components/SkillsSection.vue'
@@ -32,6 +33,7 @@ import AppFooter from './components/AppFooter.vue'
     <ProjectsSection />
     <EducationSection />
     <ContactSection />
+    <ShowcaseSection />
   </main>
 
   <AppFooter />

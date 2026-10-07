@@ -86,6 +86,7 @@ export const navLinks = [
   { id: 'experience', label: 'Kinh nghiệm' },
   { id: 'projects', label: 'Dự án' },
   { id: 'contact', label: 'Liên hệ' },
+  { id: 'showcase', label: 'Demo & Landing' },
 ]
 
 export const marquee = [

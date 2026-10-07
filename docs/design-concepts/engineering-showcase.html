@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Thuỳ Dương — Engineering Showcase · Bản phác thiết kế</title>
+  <style>
+    :root { --paper:#f4f3ed; --ink:#202623; --muted:#616b64; --line:#d5d9ce; --green:#24593f; --lime:#d5f48c; --panel:#14251e; --white:#fff; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:30px; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"Segoe UI",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    a { color:inherit; text-decoration:none; }
+    button { font:inherit; cursor:pointer; }
+    button:focus-visible,a:focus-visible { outline:3px solid #568237; outline-offset:5px; }
+    .wrap { width:min(1280px,calc(100% - 112px)); margin:auto; }
+    .mono { font-family:Consolas,"Courier New",monospace; }
+    .concept-note { padding:8px 20px; background:#e8ecdf; text-align:center; color:#53604d; font-size:11px; letter-spacing:.03em; }
+    header { height:94px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:12px; font-size:17px; font-weight:650; letter-spacing:-.4px; }
+    .brand-mark { width:35px; height:35px; border:1px solid var(--ink); display:grid; place-items:center; border-radius:50%; font-size:13px; }
+    nav { display:flex; gap:30px; font-size:13px; color:var(--muted); }
+    .contact-link { font-size:13px; font-weight:600; border-bottom:1px solid var(--ink); padding-bottom:5px; }
+    .hero { padding:66px 0 42px; display:grid; grid-template-columns:1fr 1.04fr; gap:64px; align-items:center; }
+    .eyebrow { display:flex; align-items:center; gap:9px; color:var(--green); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+    .eyebrow .dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
+    h1 { font-size:clamp(42px,5.1vw,73px); font-weight:550; line-height:1.1; letter-spacing:-3.3px; margin:25px 0 23px; }
+    h1 .accent { color:var(--green); }
+    .lead { max-width:440px; font-size:15px; color:var(--muted); line-height:1.75; margin:0; }
+    .lead strong { color:var(--ink); font-weight:600; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 27px; }
+    .tag { display:inline-flex; border:1px solid var(--line); border-radius:5px; padding:6px 9px; font-size:11px; color:#48564a; background:#eeefe6; }
+    .actions { display:flex; align-items:center; flex-wrap:wrap; gap:22px; }
+    .primary { display:inline-flex; gap:28px; align-items:center; justify-content:space-between; padding:14px 19px; background:var(--ink); color:white; border-radius:5px; font-size:13px; }
+    .secondary { font-size:13px; border-bottom:1px solid #91998e; padding-bottom:4px; }
+    .location { color:var(--muted); font-size:11px; margin:25px 0 0; }
+    .workspace { border-radius:10px; background:var(--panel); color:#e6eee5; box-shadow:0 20px 45px #213c2114; overflow:hidden; border:1px solid #324b3b; }
+    .workspace-top { display:flex; justify-content:space-between; align-items:center; padding:17px 22px; border-bottom:1px solid #ffffff13; font-size:10px; color:#c4cebf; }
+    .workspace-top .status { color:var(--lime); font-size:9px; }
+    .tabs { display:flex; padding:16px 20px 0; gap:7px; }
+    .tab { background:transparent; color:#bdc8bb; border:1px solid #405144; border-radius:5px; padding:8px 14px; font-size:11px; }
+    .tab[aria-selected="true"] { background:var(--lime); color:var(--panel); border-color:var(--lime); font-weight:650; }
+    .demo-panel { min-height:257px; position:relative; padding:18px 22px; }
+    [hidden] { display:none !important; }
+    .scene { width:100%; height:180px; display:block; }
+    .scene text { font-family:"Segoe UI",Arial,sans-serif; }
+    .demo-caption { margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:10px; color:#c3cfbe; gap:12px; }
+    .demo-caption strong { color:var(--lime); font-weight:500; }
+    .workspace-footer { padding:16px 22px; border-top:1px solid #ffffff13; display:flex; justify-content:space-between; gap:10px; font-size:10px; color:#b6c4b2; }
+    .workspace-footer b { font-weight:500; color:#ecf4e5; }
+    .target-options { display:flex; align-items:center; gap:6px; }
+    .mini-button { background:#22382a; border:1px solid #56634d; border-radius:4px; color:#e0edd4; font-size:9px; padding:5px 7px; }
+    .mini-button[aria-pressed="true"] { color:var(--panel); background:var(--lime); }
+    .map-scene { background:repeating-linear-gradient(0deg,transparent 0 24px,#263c30 24px 25px),repeating-linear-gradient(90deg,transparent 0 24px,#263c30 24px 25px); border-radius:6px; }
+    .map-layer { transition:opacity .25s; }
+    .ad-stage { height:180px; display:flex; align-items:center; justify-content:center; gap:16px; border:1px solid #304736; border-radius:6px; background:#192d22; }
+    .ad-frame { width:260px; height:130px; border-radius:5px; padding:16px; background:#d5f48c; color:#17351f; position:relative; overflow:hidden; transition:width .3s; }
+    .ad-frame.phone { width:112px; }
+    .ad-frame .ad-kicker { font-size:8px; letter-spacing:.1em; }
+    .ad-frame .ad-title { display:block; max-width:160px; position:relative; z-index:1; font-size:22px; line-height:1.15; font-weight:650; margin:9px 0; letter-spacing:-.8px; }
+    .ad-frame.phone .ad-title { font-size:16px; }
+    .ad-frame .ad-orbit { position:absolute; border:1px solid #779c3b; width:150px; height:150px; border-radius:50%; right:-58px; bottom:-75px; }
+    .ad-frame .ad-orbit::after { content:""; position:absolute; inset:17px; border:1px solid #779c3b; border-radius:50%; }
+    .ad-label { font-size:8px; padding:4px 7px; border-radius:3px; border:1px solid #587a35; display:inline-block; }
+    .evidence-strip { display:grid; grid-template-columns:.78fr 1.23fr 1.23fr; border-block:1px solid var(--line); padding:24px 0; gap:28px; }
+    .evidence-item { display:flex; align-items:center; gap:16px; }
+    .evidence-item + .evidence-item { border-left:1px solid var(--line); padding-left:28px; }
+    .evidence-number { font-size:34px; font-weight:500; letter-spacing:-1.2px; line-height:1; }
+    .evidence-item p { font-size:11px; line-height:1.6; color:var(--muted); margin:0; }
+    .evidence-item b { color:var(--ink); font-weight:600; }
+    .proof { padding:43px 0 54px; }
+    .section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:23px; }
+    .section-heading h2 { font-size:30px; font-weight:550; letter-spacing:-1px; margin:8px 0 0; }
+    .section-heading .section-note { font-size:11px; color:var(--muted); max-width:245px; line-height:1.6; margin:0; }
+    .capabilities { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    .capability { padding:22px; border:1px solid var(--line); border-radius:7px; background:#fafaf5; }
+    .capability-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .number { font-size:10px; color:#667561; }
+    .symbol { width:28px; height:28px; display:grid; place-items:center; color:var(--green); border:1px solid #d5ddca; border-radius:50%; font-size:16px; }
+    .capability h3 { margin:0 0 9px; font-size:17px; font-weight:600; letter-spacing:-.3px; }
+    .capability p { font-size:12px; color:var(--muted); line-height:1.7; min-height:42px; margin:0; }
+    .capability .tech { margin:15px 0; font-size:10px; color:var(--green); }
+    .proof-link { display:flex; gap:12px; justify-content:space-between; font-size:11px; padding-top:14px; border-top:1px solid var(--line); }
+    .case-study { display:grid; grid-template-columns:1fr 1.3fr; border-top:1px solid var(--line); padding:44px 0 48px; gap:55px; }
+    .case-study h2 { font-size:32px; line-height:1.2; margin:15px 0; font-weight:550; letter-spacing:-1px; }
+    .case-study p { font-size:13px; color:var(--muted); line-height:1.7; }
+    .case-flow { display:grid; grid-template-columns:1fr 1fr 1fr; gap:17px; }
+    .case-step { border-left:2px solid #becbb3; padding-left:16px; }
+    .case-step .mono { font-size:10px; color:var(--green); }
+    .case-step h3 { font-size:13px; margin:13px 0; }
+    .case-step p { font-size:12px; margin:0; }
+    .stack { padding:36px 0; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; gap:24px; }
+    .stack h2 { font-size:17px; margin:0 22px 0 0; font-weight:600; }
+    .stack p { font-size:12px; color:var(--muted); margin:0; line-height:1.8; }
+    .stack strong { color:var(--ink); font-weight:550; }
+    footer { border-top:1px solid var(--line); padding:27px 0 35px; display:flex; justify-content:space-between; gap:16px; font-size:11px; color:var(--muted); }
+    @media (min-width:1600px) { .hero { gap:84px; } }
+    @media (max-width:1100px) { .wrap { width:calc(100% - 64px); } .hero { gap:30px; } h1 { letter-spacing:-2px; } nav { gap:18px; } .demo-panel { padding-inline:14px; } .capability { padding:18px; } }
+    @media (max-width:800px) { .wrap { width:calc(100% - 40px); } header { height:76px; } nav { display:none; } .hero { grid-template-columns:1fr; padding:38px 0 28px; gap:32px; } h1 { font-size:54px; max-width:590px; } .lead { max-width:550px; } .workspace { max-width:600px; width:100%; } .evidence-strip { gap:16px; } .evidence-item { gap:10px; } .evidence-item + .evidence-item { padding-left:16px; } .evidence-number { font-size:28px; } .capabilities { grid-template-columns:1fr; } .capability p { min-height:0; } .capability-top { margin-bottom:10px; } .case-study { grid-template-columns:1fr; gap:20px; } .stack { gap:14px; } .section-heading { align-items:flex-start; } }
+    @media (max-width:480px) { .wrap { width:calc(100% - 36px); } .concept-note { font-size:9px; } .brand { font-size:15px; } .contact-link { font-size:11px; } h1 { font-size:43px; letter-spacing:-1.9px; } .eyebrow { font-size:9px; } .hero { gap:27px; } .lead { font-size:14px; } .tabs { padding-inline:14px; } .tab { padding:8px 10px; font-size:10px; } .workspace-top,.workspace-footer { padding-inline:14px; } .workspace-top { font-size:9px; } .demo-caption { flex-wrap:wrap; } .demo-panel { min-height:246px; } .scene { height:160px; } .evidence-strip { grid-template-columns:1fr; padding:20px 0; gap:16px; } .evidence-item + .evidence-item { border-left:0; padding-left:0; } .evidence-number { min-width:46px; } .section-heading { flex-direction:column; gap:10px; } .section-heading h2 { font-size:26px; } .section-heading .section-note { max-width:none; } .proof { padding-top:32px; } .case-flow { grid-template-columns:1fr; } .case-study h2 { font-size:28px; } footer { flex-direction:column; } }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition:none !important; } }
+  </style>
+</head>
+<body>
+  <div class="concept-note mono">BẢN PHÁC THIẾT KẾ · ENGINEERING SHOWCASE · Demo minh hoạ bằng dữ liệu mẫu</div>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="#main" aria-label="Thuỳ Dương — đầu trang"><span class="brand-mark mono">td.</span> Thuỳ Dương</a>
+      <nav aria-label="Điều hướng"><a href="#expertise">Chuyên môn</a><a href="#case-study">Dự án tiêu biểu</a><a href="#stack">Công nghệ</a></nav>
+      <a class="contact-link" href="mailto:duongthuynt97@gmail.com">Kết nối với mình ↗</a>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="eyebrow mono"><span class="dot"></span> Fullstack / Software Engineer</div>
+          <h1 id="hero-title">Từ ý tưởng<br>đến sản phẩm<br><span class="accent">vận hành.</span></h1>
+          <p class="lead">Mình là <strong>Thuỳ Dương</strong>. 7 năm phát triển sản phẩm web từ kiến trúc đến vận hành — chuyên sâu <strong>Laravel, Vue &amp; Svelte</strong>, với thế mạnh về quảng cáo tương tác và bản đồ dữ liệu.</p>
+          <div class="hero-tags"><span class="tag mono">Fullstack systems</span><span class="tag mono">Interactive media</span><span class="tag mono">GIS &amp; data</span></div>
+          <div class="actions"><a class="primary" href="#expertise">Khám phá chuyên môn <span aria-hidden="true">↗</span></a><a class="secondary" href="../../public/Thuy-Duong-CV.pdf" download>Tải CV ↓</a></div>
+          <p class="location mono">HÀ NỘI, VIỆT NAM &nbsp; / &nbsp; PHÁT TRIỂN SẢN PHẨM TỪ 2019</p>
+        </div>
+        <div class="workspace">
+          <div class="workspace-top mono"><span>EXPERIMENTS / ENGINEERING IN ACTION</span><span class="status">● DEMO MINH HOẠ</span></div>
+          <div class="tabs" role="tablist" aria-label="Khám phá các nhóm chuyên môn">
+            <button class="tab" id="tab-qr" role="tab" aria-selected="true" aria-controls="panel-qr" tabindex="0" data-tab="qr">01 / Dynamic QR</button>
+            <button class="tab" id="tab-ads" role="tab" aria-selected="false" aria-controls="panel-ads" tabindex="-1" data-tab="ads">02 / Ads</button>
+            <button class="tab" id="tab-gis" role="tab" aria-selected="false" aria-controls="panel-gis" tabindex="-1" data-tab="gis">03 / GIS</button>
+          </div>
+          <div class="demo-panel" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr" tabindex="0">
+            <svg class="scene" viewBox="0 0 480 180" role="img" aria-label="Sơ đồ: mã QR giữ nguyên, shortlink chuyển hướng đến trang đích có thể thay đổi">
+              <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0 6 3 0 6" fill="none" stroke="#9ab57a" stroke-width="1"/></marker></defs>
+              <rect x="9" y="30" width="105" height="120" rx="7" fill="#20382a" stroke="#4c624a"/>
+              <g transform="translate(36 44)" fill="none" stroke="#d5f48c" stroke-width="4"><rect width="18" height="18"/><rect x="32" width="18" height="18"/><rect y="32" width="18" height="18"/><path d="M30 30h10v10h10M30 48h7M48 47v5M7 7h4v4H7zM39 7h4v4h-4zM7 39h4v4H7z"/></g>
+              <text x="61" y="119" text-anchor="middle" fill="#e0ead7" font-size="11">QR cố định</text><text x="61" y="136" text-anchor="middle" fill="#91a28c" font-size="9">Không cần in lại</text>
+              <path d="M118 88h50" stroke="#9ab57a" fill="none" marker-end="url(#arrow)"/>
+              <rect x="177" y="51" width="125" height="78" rx="6" fill="#d5f48c"/><text x="239" y="77" text-anchor="middle" fill="#1d3927" font-size="10">LARAVEL + REDIS</text><text x="239" y="101" text-anchor="middle" fill="#1d3927" font-size="15" font-weight="600">Shortlink</text><text x="239" y="118" text-anchor="middle" fill="#456638" font-size="9">Resolve → Redirect</text>
+              <path d="M309 88h50" stroke="#9ab57a" fill="none" marker-end="url(#arrow)"/>
+              <rect x="369" y="47" width="103" height="86" rx="6" fill="#20382a" stroke="#69814e"/><circle cx="382" cy="60" r="2" fill="#d5f48c"/><path d="M391 60h67" stroke="#4c624a"/><text x="420" y="88" text-anchor="middle" fill="#e0ead7" font-size="11" id="qr-target">Trang đích A</text><text x="420" y="112" text-anchor="middle" fill="#b7cc9a" font-size="9">URL có thể đổi</text>
+              <path d="M421 141v15H239v-18" stroke="#546e45" stroke-dasharray="3 4" fill="none"/><text x="329" y="173" text-anchor="middle" fill="#92a682" font-size="9">Cập nhật đích · Giữ nguyên QR</text>
+            </svg>
+            <div class="demo-caption"><span>Thử đổi URL đích, <strong>QR vẫn giữ nguyên.</strong></span><div class="target-options" aria-label="Chọn trang đích"><button class="mini-button" data-target="A" aria-pressed="true">Trang A</button><button class="mini-button" data-target="B" aria-pressed="false">Trang B</button></div></div>
+          </div>
+          <div class="demo-panel" id="panel-ads" role="tabpanel" aria-labelledby="tab-ads" tabindex="0" hidden>
+            <div class="ad-stage"><div class="ad-frame" id="ad-frame"><span class="ad-kicker mono">RICH MEDIA / PREVIEW</span><span class="ad-title">Một core.<br>Nhiều định dạng.</span><span class="ad-label">Svelte · Component</span><span class="ad-orbit" aria-hidden="true"></span></div></div>
+            <div class="demo-caption"><span><strong>Core Ads</strong> &amp; simulator nhiều thiết bị.</span><div class="target-options" aria-label="Chọn kích thước quảng cáo"><button class="mini-button" data-device="desktop" aria-pressed="true">Desktop</button><button class="mini-button" data-device="phone" aria-pressed="false">Mobile</button></div></div>
+          </div>
+          <div class="demo-panel" id="panel-gis" role="tabpanel" aria-labelledby="tab-gis" tabindex="0" hidden>
+            <svg class="scene map-scene" viewBox="0 0 480 180" role="img" aria-label="Sơ đồ dữ liệu mẫu, có thể bật hoặc tắt lớp vùng rủi ro">
+              <g fill="none" stroke="#536d50" stroke-width="1"><path d="M-10 30Q80 110 170 25T340 80T490 45M-10 80Q100 10 180 85T370 105T490 70M-10 140Q70 40 190 150T350 120T490 140"/><path d="M65 -10Q15 70 125 190M260 -10Q320 60 245 190M425 -10Q340 80 440 190"/></g>
+              <path d="M-10 165Q100 60 200 115T350 80T490 20" fill="none" stroke="#7fbbb0" stroke-width="10" opacity=".5"/>
+              <g class="map-layer" id="risk-layer" fill="#d5f48c" fill-opacity=".16" stroke="#d5f48c" stroke-width="1" stroke-dasharray="4 3"><path d="M130 40 220 20 285 70 246 117 157 105Z"/><path d="M310 98 379 67 447 110 420 155 330 151Z"/></g>
+              <g fill="#d5f48c" stroke="#182c1d" stroke-width="4"><circle cx="180" cy="73" r="7"/><circle cx="249" cy="101" r="7"/><circle cx="354" cy="118" r="7"/></g><rect x="17" y="14" width="147" height="25" rx="4" fill="#14251e"/><text x="27" y="30" fill="#c5d7b8" font-size="10">GEOJSON / DỮ LIỆU MẪU</text>
+            </svg>
+            <div class="demo-caption"><span>Layers · Markers · <strong>Vùng rủi ro</strong></span><button class="mini-button" id="toggle-risk" aria-pressed="true">Lớp vùng rủi ro: Bật</button></div>
+          </div>
+          <div class="workspace-footer mono"><span id="demo-stack">Laravel / MySQL / Redis</span><b id="demo-focus">Thiết kế → Phát triển → Vận hành</b></div>
+        </div>
+      </section>
+      <div class="evidence-strip" aria-label="Kinh nghiệm và thành tích">
+        <div class="evidence-item"><span class="evidence-number">7</span><p><b>Năm kinh nghiệm</b><br>Phát triển sản phẩm thực tế</p></div>
+        <div class="evidence-item"><span class="evidence-number">3</span><p><b>Năm đạt Nhân viên Xuất sắc</b><br>2022 · 2023 · 2025</p></div>
+        <div class="evidence-item"><span class="evidence-number">↗</span><p><b>Từ kiến trúc đến vận hành</b><br>Phân tích · Xây dựng · Tối ưu · Rebuild</p></div>
+      </div>
+      <section class="proof" id="expertise" aria-labelledby="expertise-title">
+        <div class="section-heading"><div><div class="eyebrow mono">01 / Chuyên môn nổi bật</div><h2 id="expertise-title">Năng lực đi cùng sản phẩm.</h2></div><p class="section-note">Mỗi nhóm chuyên môn được thể hiện qua một bài toán mình đã giải quyết.</p></div>
+        <div class="capabilities">
+          <article class="capability"><div class="capability-top"><span class="number mono">01 / SYSTEMS</span><span class="symbol" aria-hidden="true">⌘</span></div><h3>Hệ thống web &amp; API</h3><p>Thiết kế dữ liệu, xây dựng dịch vụ và tối ưu luồng chuyển hướng với cache.</p><div class="tech mono">Laravel · MySQL · Redis</div><a class="proof-link" href="#case-study"><span>Dynamic Shortlink &amp; QR Code</span><span aria-hidden="true">↗</span></a></article>
+          <article class="capability"><div class="capability-top"><span class="number mono">02 / INTERACTIVE</span><span class="symbol" aria-hidden="true">↗</span></div><h3>Quảng cáo &amp; tương tác</h3><p>Xây dựng core template và simulator để xem trước quảng cáo trên nhiều thiết bị.</p><div class="tech mono">Svelte · Vue · GSAP</div><button class="proof-link" style="background:none;border-inline:0;border-bottom:0;width:100%;padding-inline:0;color:inherit;text-align:left" data-open-demo="ads"><span>Core Ads &amp; Demo Simulator</span><span aria-hidden="true">↗</span></button></article>
+          <article class="capability"><div class="capability-top"><span class="number mono">03 / GEOSPATIAL</span><span class="symbol" aria-hidden="true">◎</span></div><h3>Bản đồ &amp; dữ liệu địa lý</h3><p>Tích hợp dữ liệu nhiều lớp, markers và vùng rủi ro cho các cổng thông tin chuyên đề.</p><div class="tech mono">Leaflet · GeoJSON · Vue</div><button class="proof-link" style="background:none;border-inline:0;border-bottom:0;width:100%;padding-inline:0;color:inherit;text-align:left" data-open-demo="gis"><span>GIS &amp; hạ tầng giao thông</span><span aria-hidden="true">↗</span></button></article>
+        </div>
+      </section>
+      <section class="case-study" id="case-study" aria-labelledby="case-title">
+        <div><div class="eyebrow mono">02 / Dự án tiêu biểu</div><h2 id="case-title">QR cố định.<br>Điểm đến linh hoạt.</h2><p>Dynamic Shortlink &amp; QR Code động<br>Vai trò: Fullstack Developer — thiết kế, phát triển &amp; vận hành.</p></div>
+        <div class="case-flow"><div class="case-step"><span class="mono">01 / BÀI TOÁN</span><h3>Đổi liên kết sau khi in</h3><p>Mã QR trên bao bì và ấn phẩm cần tiếp tục sử dụng khi URL đích thay đổi.</p></div><div class="case-step"><span class="mono">02 / GIẢI PHÁP</span><h3>Thêm lớp shortlink</h3><p>Laravel xử lý chuyển hướng; MySQL lưu liên kết; Redis hỗ trợ cache.</p></div><div class="case-step"><span class="mono">03 / GIÁ TRỊ</span><h3>Cập nhật mà không in lại</h3><p>Tách mã QR khỏi URL đích, cho phép cập nhật liên kết và duy trì ấn phẩm.</p></div></div>
+      </section>
+      <section class="stack" id="stack" aria-labelledby="stack-title"><h2 id="stack-title">Nền tảng kỹ thuật</h2><p><strong>Frontend</strong><br>Vue · Svelte · TypeScript</p><p><strong>Backend &amp; Data</strong><br>Laravel · MySQL · Redis</p><p><strong>Chuyên môn bổ sung</strong><br>Legacy refactoring · System rebuilding</p><p><strong>Công cụ triển khai</strong><br>Git · Vite · Linux</p></section>
+    </main>
+    <footer><span>Thuỳ Dương / Fullstack &amp; Software Engineering</span><a href="https://github.com/thuyduongnt97" target="_blank" rel="noopener noreferrer">GitHub ↗</a><span class="mono">BẢN PHÁC — CHƯA ÁP DỤNG VÀO WEBSITE</span></footer>
+  </div>
+  <script>
+    const tabs = [...document.querySelectorAll('[data-tab]')];
+    const demoDetails = {
+      qr:['Laravel / MySQL / Redis','Thiết kế → Phát triển → Vận hành'],
+      ads:['Svelte / Laravel / Vue','Core template → Preview → Duyệt'],
+      gis:['Vue / Leaflet / GeoJSON','Dữ liệu → Layers → Trực quan']
+    };
+    function selectTab(name, focus = false) {
+      tabs.forEach(tab => {
+        const selected = tab.dataset.tab === name;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
+        if (selected && focus) tab.focus();
+      });
+      document.getElementById('demo-stack').textContent = demoDetails[name][0];
+      document.getElementById('demo-focus').textContent = demoDetails[name][1];
+    }
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab.dataset.tab));
+      tab.addEventListener('keydown', event => {
+        let next;
+        if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+        if (event.key === 'Home') next = 0;
+        if (event.key === 'End') next = tabs.length - 1;
+        if (next !== undefined) { event.preventDefault(); selectTab(tabs[next].dataset.tab, true); }
+      });
+    });
+    document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-target]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      document.getElementById('qr-target').textContent = 'Trang đích ' + button.dataset.target;
+    }));
+    document.querySelectorAll('[data-device]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll('[data-device]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      document.getElementById('ad-frame').classList.toggle('phone', button.dataset.device === 'phone');
+    }));
+    document.getElementById('toggle-risk').addEventListener('click', event => {
+      const button = event.currentTarget;
+      const visible = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(visible));
+      button.textContent = 'Lớp vùng rủi ro: ' + (visible ? 'Bật' : 'Tắt');
+      document.getElementById('risk-layer').style.opacity = visible ? '1' : '0';
+    });
+    document.querySelectorAll('[data-open-demo]').forEach(button => button.addEventListener('click', () => {
+      selectTab(button.dataset.openDemo, true);
+      document.querySelector('.workspace').scrollIntoView({ block:'center' });
+    }));
+  </script>
+</body>
+</html>

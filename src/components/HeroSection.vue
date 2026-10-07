@@ -53,8 +53,8 @@ const codeLines = [
           <!-- eslint-disable-next-line vue/no-v-html -->
           <p v-reveal="240" class="hero__lead" v-html="profile.lead" />
           <div v-reveal="300" class="hero__cta">
-            <a class="btn btn--primary" href="#projects">
-              Xem dự án <BaseIcon class="icon-arrow" name="arrow" />
+            <a class="btn btn--primary" href="#showcase">
+              Xem demo &amp; landing page <BaseIcon class="icon-arrow" name="arrow" />
             </a>
             <a class="btn btn--ghost" :href="profile.cvUrl" download>
               <BaseIcon name="download" /> Tải CV (PDF)

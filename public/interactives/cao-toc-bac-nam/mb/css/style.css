@@ -1,0 +1,97 @@
+body {
+    margin: 0 auto;
+    background-color: #fff;
+    font-family: 'Source Sans Pro';
+    color:#505050;
+    line-height: 1.3;
+    font-size: 1em;
+    overflow-x: hidden;
+}
+.header{
+    min-height: 56px;
+}
+.header__middle {
+    border-bottom: 1px solid var(--neutral-30,#e8e8e8);
+    background: var(--neutral-0,#fff);
+    padding: 12px 0;
+    position: relative
+}
+
+.header__mflex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.header__mflex .logo-hm {
+    display: flex
+}
+.header__mflex .logo-hm {
+    width: 141px
+}
+.header img{
+    max-width: 100%;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    color: transparent
+
+    
+}
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 16px;
+    padding-right: 16px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+.content-text{
+    color: var(--neutral-100, #282828);
+
+    font-family: 'Source Sans Pro';
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32.6px;
+    letter-spacing: 0.2px;
+    margin: 15px 20px;
+    text-align: justify;
+}
+.detail-duan svg {
+    margin: 0 auto;
+    width: 100vw;
+}
+.mapsvg-scrollpane > svg {
+}
+
+.footer,
+.main-footer {
+    display: flex;
+    bottom: 0px;
+    justify-content: space-between;
+    background-color: #d2d2d2;
+    height: 30px;
+    width: 100%;
+}
+
+.other {
+    margin: 6px 0px 0px 25px;
+}
+.overview {
+    margin: 6px 25px 0px 0px;
+}
+.detail-info {
+    margin: 4px 5px 0px 0px;
+}
+.footer-line {
+    margin: 0px 40px 0px 0px;
+}
+.linkOverview{
+    margin: 6px 25px 0px 0px;
+}
+.footer1 * {
+    box-sizing: border-box;
+}
+
+@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BlackIt.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BlackIt.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BlackIt.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BlackIt.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BlackIt.ttf) format("truetype");font-weight:900;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Bold.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Bold.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Bold.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Bold.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Bold.ttf) format("truetype");font-weight:700;font-style:normal;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLight.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLight.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLight.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLight.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLight.ttf) format("truetype");font-weight:200;font-style:normal;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLightIt.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLightIt.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLightIt.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLightIt.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-ExtraLightIt.ttf) format("truetype");font-weight:200;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BoldIt.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BoldIt.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BoldIt.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BoldIt.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-BoldIt.ttf) format("truetype");font-weight:700;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Black.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Black.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Black.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Black.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Black.ttf) format("truetype");font-weight:900;font-style:normal;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-LightIt.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-LightIt.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-LightIt.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-LightIt.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-LightIt.ttf) format("truetype");font-weight:300;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Light.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Light.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Light.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Light.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Light.ttf) format("truetype");font-weight:300;font-style:normal;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Regular.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Regular.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Regular.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Regular.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Regular.ttf) format("truetype");font-weight:400;font-style:normal;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-It.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-It.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-It.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-It.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-It.ttf) format("truetype");font-weight:400;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-SemiboldIt.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-SemiboldIt.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-SemiboldIt.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-SemiboldIt.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-SemiboldIt.ttf) format("truetype");font-weight:600;font-style:italic;font-display:swap}@font-face{font-family:'Source Serif Pro';src:url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Semibold.eot);src:url("https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Semibold.eot?#iefix") format("embedded-opentype"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Semibold.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Semibold.woff) format("woff"),url(https://static.mediacdn.vn/fonts/SourceSerifPro/SourceSerifPro-Semibold.ttf) format("truetype");font-weight:600;font-style:normal;font-display:swap}@font-face{font-family:Inter;font-style:normal;font-weight:400;src:url(https://static.mediacdn.vn/fonts/Inter-Regular.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/Inter-Regular.woff) format("woff"),url(https://static.mediacdn.vn/fonts/Inter-Regular.ttf) format("truetype"),url(https://static.mediacdn.vn/fonts/Inter-Regular.eot) format("embedded-opentype");font-display:swap}@font-face{font-family:Inter;font-style:normal;font-weight:500;src:url(https://static.mediacdn.vn/fonts/Inter-Medium.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/Inter-Medium.woff) format("woff"),url(https://static.mediacdn.vn/fonts/Inter-Medium.ttf) format("truetype"),url(https://static.mediacdn.vn/fonts/Inter-Medium.eot) format("embedded-opentype");font-display:swap}@font-face{font-family:Inter;font-style:normal;font-weight:600;src:url(https://static.mediacdn.vn/fonts/Inter-SemiBold.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/Inter-SemiBold.woff) format("woff"),url(https://static.mediacdn.vn/fonts/Inter-SemiBold.ttf) format("truetype"),url(https://static.mediacdn.vn/fonts/Inter-SemiBold.eot) format("embedded-opentype");font-display:swap}@font-face{font-family:Inter;font-style:normal;font-weight:700;src:url(https://static.mediacdn.vn/fonts/Inter-Bold.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/Inter-Bold.woff) format("woff"),url(https://static.mediacdn.vn/fonts/Inter-Bold.ttf) format("truetype"),url(https://static.mediacdn.vn/fonts/Inter-Bold.eot) format("embedded-opentype");font-display:swap}@font-face{font-family:Inter;font-style:normal;font-weight:800;src:url(https://static.mediacdn.vn/fonts/Inter-Black.woff2) format("woff2"),url(https://static.mediacdn.vn/fonts/Inter-Black.woff) format("woff"),url(https://static.mediacdn.vn/fonts/Inter-Black.ttf) format("truetype"),url(https://static.mediacdn.vn/fonts/Inter-Black.eot) format("embedded-opentype");font-display:swap}.footer1 a{outline:0;text-decoration:none}.footer1{border-top:1px solid var(--neutral-30,#e8e8e8);background:var(--neutral-05,#f5f6f8);padding:24px 8px 75px 8px;height:auto}.footer__menu-ft .list{display:flex;flex-wrap:wrap;gap:24px}.footer__menu-ft .list .item{display:block;color:var(--neutral-100,#282828);font-family:Source Serif Pro;font-size:20px;font-style:normal;font-weight:600;line-height:130%;width:calc(50% - 12px)}.footer__network{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--neutral-30,#e8e8e8);border-bottom:1px solid var(--neutral-30,#e8e8e8);padding:16px 0;margin:16px 0}.footer__network .text-link{color:var(--piamry-color-100,#e81d1a);font-family:Source Serif Pro;font-size:20px;font-style:normal;font-weight:700;line-height:130%;display:block}.footer__network .network-list{display:flex;align-items:center;gap:16px}.footer__network .network-list .icon{display:flex}.footer__address .sapo{color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:400;line-height:160%;margin-bottom:16px}.footer__address .des{color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:400;line-height:160%;margin-bottom:16px}.footer__address .des .des2{color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:600;line-height:130%}.footer__address .hotel-flex{display:flex;gap:41px;margin-bottom:16px}.footer__address .hotel-flex .col{color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:400;line-height:160%}.footer__address .hotel-flex .col:last-child{flex:1}.footer__address .hotel-flex .col .link{display:block;color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:600;line-height:130%}.footer__address .sapo2{color:var(--neutral-100,#282828);font-family:Inter;font-size:16px;font-style:normal;font-weight:400;line-height:160%;margin-bottom:16px}.footer__address .logo-bottom-flex{display:flex;align-items:center}.footer__address .logo-bottom-flex .logo-ft{display:flex}.footer__address .logo-bottom-flex .btn{border-radius:4px;background:var(--piamry-color-90,#e14644);margin-left:9px;color:var(--neutral-0,#fff);text-align:center;font-family:Inter;font-size:16px;font-style:normal;font-weight:600;line-height:130%;padding:4px 8px;display:flex;justify-content:center;flex:1}.footer__nav-detail{position:fixed;width:100%;left:0;z-index:99991;bottom:0;background:#fff;box-shadow:0 -5px 6px rgba(0,0,0,.04);bottom:-200px;transition:.4s}.footer__nav-detail.show{bottom:0}.footer__nav-detail .change-font{border-bottom:1px solid #f2f2f2;padding:16px 24px;display:none}.footer__nav-detail .change-font .top{display:flex;align-items:center;justify-content:space-between;font-size:16px;line-height:26px;text-align:center;color:#222;margin-bottom:16px}.footer__nav-detail .change-font .top .text{font-family:Inter;font-style:normal;font-weight:400;font-size:14px;line-height:22px;text-align:center;color:#1a1a1a}.footer__nav-detail .change-font .middle{display:flex;width:100%}.footer__nav-detail .change-font .middle .rdo-mob{width:100%}.footer__nav-detail .change-font .middle .btn-font{display:flex;width:32px;height:32px;background:#f2f2f2;border-radius:4px;justify-content:center;align-items:center;margin:0 4px}.footer__nav-detail .change-font .middle .input-change{flex:1}.footer__nav-detail .nav-b ul{display:flex}.footer__nav-detail .nav-b ul li{width:20%}.footer__nav-detail .nav-b ul li .item{display:flex;width:100%;align-items:center;justify-content:center;height:54px}.footer__nav-detail .nav-b ul li .item .icon{position:relative}.footer__nav-detail .nav-b ul li .item .icon.active svg{fill:#ffc700}.footer__nav-detail .nav-b ul li .item .icon.active path{fill:#ffc700}.footer__nav-detail .nav-b ul li .item .icon .count{color:var(--neutral-color-0,#fff);font-family:Inter;font-size:10px;font-style:normal;font-weight:400;line-height:normal;border-radius:100px;background:var(--pimary-color-100,#ed1c24);border-radius:100px;position:absolute;right:-12px;top:-12px;padding:3px}

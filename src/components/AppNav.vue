@@ -40,7 +40,7 @@ const onViewportChange = ({ matches }) => {
 }
 
 onMounted(() => {
-  mobileQuery = window.matchMedia('(max-width: 900px)')
+  mobileQuery = window.matchMedia('(max-width: 1100px)')
   mobileQuery.addEventListener('change', onViewportChange)
   document.addEventListener('keydown', onKey)
   document.addEventListener('click', onDocClick)

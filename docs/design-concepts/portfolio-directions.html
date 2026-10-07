@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thuỳ Dương — Bốn hướng thiết kế portfolio</title>
+  <style>
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:#eaeaf0; color:#252633; font-family:"Segoe UI",Arial,sans-serif; }
+    .board { width:min(1600px,calc(100% - 80px)); margin:auto; padding:38px 0 28px; }
+    .board-top { display:flex; justify-content:space-between; align-items:flex-end; gap:30px; margin-bottom:29px; }
+    .board-top h1 { margin:9px 0 0; font-size:36px; font-weight:600; letter-spacing:-1.3px; }
+    .board-kicker { color:#656677; font:11px Consolas,monospace; letter-spacing:.08em; }
+    .board-top p { max-width:450px; margin:0; font-size:12px; color:#656677; line-height:1.7; }
+    .directions { display:grid; grid-template-columns:1fr 1fr; gap:27px; }
+    .direction { overflow:hidden; background:#fff; border-radius:12px; border:1px solid #d5d6df; box-shadow:0 7px 18px #21213806; scroll-margin-top:20px; }
+    .direction-title { padding:15px 19px; display:flex; align-items:center; justify-content:space-between; gap:15px; border-bottom:1px solid #e9e9ee; }
+    .direction-title h2 { font-size:16px; margin:0; font-weight:600; letter-spacing:-.2px; }
+    .direction-title h2 span { display:inline-block; color:#7b7b90; font:12px Consolas,monospace; margin-right:9px; }
+    .palette { display:flex; align-items:center; gap:6px; }
+    .palette i { width:13px; height:13px; border-radius:50%; border:1px solid #00000015; }
+    .sketch { overflow:hidden; aspect-ratio:720/440; position:relative; background:#fff; }
+    .scene { width:720px; height:440px; transform-origin:top left; overflow:hidden; position:absolute; top:0; left:0; }
+    .direction-info { padding:17px 19px 20px; border-top:1px solid #e9e9ee; }
+    .direction-info p { margin:0; font-size:12px; line-height:1.7; color:#5e6070; }
+    .direction-info b { color:#2b2c38; font-weight:600; }
+    .direction-info .tradeoff { margin-top:7px; color:#767687; font-size:11px; }
+    .board-bottom { margin-top:22px; display:flex; justify-content:space-between; gap:20px; color:#6b6c7d; font-size:11px; line-height:1.7; }
+    .mono { font-family:Consolas,monospace; }
+    .mini-nav { display:flex; justify-content:space-between; align-items:center; }
+    .mini-nav .links { display:flex; gap:20px; font-size:9px; }
+    /* 01: a technical map with named layers and project evidence. */
+    .atlas { background:#0b1221; color:#e9edf7; padding:23px 27px; }
+    .atlas .mini-nav { padding-bottom:19px; border-bottom:1px solid #263145; font-size:12px; }
+    .atlas .mark { display:inline-grid; place-items:center; border:1px solid #4f7fd7; color:#85b1ff; width:25px; height:25px; margin-right:8px; font-size:10px; }
+    .atlas .links { color:#9faecb; }
+    .atlas-header { display:flex; justify-content:space-between; align-items:flex-end; margin:20px 0 16px; }
+    .atlas-header small { color:#83a9ed; font:9px Consolas,monospace; letter-spacing:.06em; }
+    .atlas-header h3 { margin:9px 0 0; font-size:32px; line-height:1.12; font-weight:550; letter-spacing:-1.1px; }
+    .atlas-header p { margin:0 0 2px; max-width:181px; color:#a5b2cb; font-size:9px; line-height:1.7; }
+    .atlas-body { display:grid; grid-template-columns:133px 1fr; border:1px solid #293550; height:216px; }
+    .atlas-sidebar { padding:16px 11px; background:#111c30; border-right:1px solid #293550; }
+    .atlas-sidebar .label { font:8px Consolas,monospace; color:#8190b0; margin-bottom:15px; }
+    .atlas-sidebar .item { font-size:9px; color:#a9b8d4; padding:10px 9px; margin-bottom:5px; display:flex; justify-content:space-between; }
+    .atlas-sidebar .item.active { color:#c7d9ff; background:#244478; border-left:2px solid #77a9ff; }
+    .atlas-content { padding:16px 19px; background:radial-gradient(#263147 1px,transparent 1px); background-size:15px 15px; }
+    .atlas-content .topline { display:flex; justify-content:space-between; color:#9cadd0; font:8px Consolas,monospace; }
+    .architecture { display:grid; grid-template-columns:1fr 24px 1fr 24px 1fr; margin-top:23px; align-items:center; }
+    .arch-node { padding:13px 9px; border:1px solid #345183; background:#15233d; border-radius:3px; text-align:center; }
+    .arch-node .node-label { font:7px Consolas,monospace; color:#8aa4cc; display:block; }
+    .arch-node b { display:block; margin:6px 0 5px; font-size:11px; font-weight:600; }
+    .arch-node small { font:7px Consolas,monospace; color:#7aa7f5; }
+    .connector { color:#6994dc; text-align:center; font-size:16px; }
+    .atlas-proof { margin-top:16px; padding-top:11px; border-top:1px solid #2b3a53; display:flex; justify-content:space-between; gap:15px; }
+    .atlas-proof small { font:7px Consolas,monospace; color:#88a8dd; }
+    .atlas-proof b { font-size:10px; font-weight:550; margin:4px 0; display:block; }
+    .atlas-proof p { font-size:8px; line-height:1.6; margin:0; color:#96a7c5; }
+    .atlas-proof .arrow { color:#82affb; font-size:23px; align-self:center; }
+    /* 02: oversized typography, a campaign canvas and a motion ribbon. */
+    .motion { background:#251016; color:#ffece7; padding:23px 27px; }
+    .motion .mini-nav { font-size:12px; padding-bottom:18px; border-bottom:1px solid #70403b; }
+    .motion .logo { font-weight:650; }
+    .motion .logo i { font-style:normal; color:#e4ff70; margin-right:6px; }
+    .motion .links { color:#ceaaa4; }
+    .motion-main { display:grid; grid-template-columns:1.05fr 1fr; gap:28px; margin-top:29px; align-items:center; }
+    .motion .kicker { color:#e4ff70; font:9px Consolas,monospace; letter-spacing:.07em; }
+    .motion h3 { font-family:Impact,"Arial Black",sans-serif; font-size:76px; font-weight:500; line-height:.97; letter-spacing:-1px; margin:13px 0 16px; }
+    .motion h3 .outline { -webkit-text-stroke:1px #ffece7; color:transparent; }
+    .motion .intro { font-size:10px; color:#d8b4af; line-height:1.7; max-width:240px; margin:0; }
+    .motion .cta { display:inline-flex; align-items:center; gap:30px; font-size:10px; border-bottom:1px solid #e4ff70; padding-bottom:5px; margin-top:15px; color:#e4ff70; }
+    .motion-preview { height:239px; position:relative; }
+    .campaign { position:absolute; width:238px; height:199px; left:17px; top:13px; background:#ff836e; color:#351518; padding:16px; transform:rotate(-6deg); border-radius:2px; }
+    .campaign small { font:8px Consolas,monospace; }
+    .campaign .campaign-title { font-weight:700; font-size:38px; line-height:.92; letter-spacing:-1.6px; margin-top:21px; }
+    .campaign .campaign-bottom { position:absolute; bottom:16px; left:16px; font-size:8px; }
+    .campaign .orbital { border:1px solid #843c35; width:85px; height:85px; position:absolute; bottom:24px; right:17px; border-radius:50%; }
+    .campaign .orbital::before { content:""; border:1px solid #843c35; inset:12px; position:absolute; border-radius:50%; }
+    .campaign-label { position:absolute; z-index:2; top:-2px; left:125px; background:#e4ff70; color:#241913; font:8px Consolas,monospace; padding:10px 13px; transform:rotate(4deg); }
+    .campaign-control { position:absolute; bottom:5px; left:1px; z-index:2; display:flex; gap:10px; align-items:center; background:#42232a; border:1px solid #81534d; padding:11px 12px; font:8px Consolas,monospace; }
+    .campaign-control .progress { width:83px; background:#76594e; height:2px; }
+    .campaign-control .progress::before { content:""; display:block; width:65%; height:2px; background:#e4ff70; }
+    .motion-ribbon { margin:25px -35px 0; padding:13px 10px; background:#e4ff70; color:#291319; font-family:Impact,"Arial Black",sans-serif; font-size:18px; letter-spacing:.8px; text-align:center; transform:rotate(-2deg); white-space:nowrap; }
+    /* 03: a cinematic chapter with a central object and a scroll timeline. */
+    .scroll-story { background:#121219; color:#eeeef6; padding:23px 27px; }
+    .scroll-story .mini-nav { border-bottom:1px solid #343140; padding-bottom:16px; font-size:11px; }
+    .scroll-story .links { color:#a4a0b4; font-size:8px; }
+    .story-stage { height:306px; position:relative; padding:25px 0; }
+    .story-stage .ghost-num { position:absolute; font-size:239px; font-weight:650; line-height:1; letter-spacing:-20px; left:151px; top:25px; color:#21202d; }
+    .story-copy { position:relative; z-index:2; }
+    .story-copy small { color:#b59af5; font:9px Consolas,monospace; }
+    .story-copy h3 { font-size:48px; line-height:1.05; font-weight:550; letter-spacing:-1.9px; margin:20px 0 13px; }
+    .story-copy p { max-width:188px; color:#aaa4be; font-size:9px; line-height:1.8; margin:0; }
+    .story-preview { position:absolute; width:277px; height:169px; background:#b7a1f3; color:#252136; left:301px; top:78px; transform:perspective(500px) rotateY(-15deg) rotateZ(-4deg); padding:15px; box-shadow:17px 14px 0 #4c3f75; }
+    .story-preview .chrome { display:flex; align-items:center; justify-content:space-between; font:7px Consolas,monospace; border-bottom:1px solid #8c74c3; padding-bottom:10px; }
+    .story-preview .story-ad { margin:17px 0 0; font-size:27px; line-height:1; font-weight:650; letter-spacing:-1px; }
+    .story-preview .story-ad small { display:block; margin-top:12px; font:8px Consolas,monospace; }
+    .story-preview .ad-disc { width:72px; height:72px; border:1px solid #554179; border-radius:50%; position:absolute; bottom:23px; right:25px; }
+    .story-preview .ad-disc::before { content:""; inset:9px -9px; border:1px solid #554179; border-radius:50%; position:absolute; }
+    .story-rail { position:absolute; right:0; top:52px; height:178px; border-left:1px solid #565164; padding-left:13px; font:8px Consolas,monospace; color:#80778f; display:flex; flex-direction:column; justify-content:space-between; }
+    .story-rail span:first-child { color:#ccb6ff; }
+    .story-rail span:last-child { writing-mode:vertical-rl; color:#b5a0d7; font-size:7px; }
+    .story-timeline { display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; }
+    .story-timeline div { border-top:2px solid #37323e; padding-top:10px; font:8px Consolas,monospace; color:#7d748d; }
+    .story-timeline div:first-child { border-color:#b59af5; color:#d4bfff; }
+    /* 04: a gallery of distinct product canvases with direct interactions. */
+    .gallery { background:#e4edff; color:#13224c; padding:23px 27px; }
+    .gallery .mini-nav { font-size:12px; }
+    .gallery .logo { font-weight:650; }
+    .gallery .logo .asterisk { color:#3b54ef; font-size:25px; margin-right:7px; vertical-align:middle; }
+    .gallery .links { color:#536693; }
+    .gallery-heading { display:flex; align-items:flex-end; justify-content:space-between; margin:23px 0 19px; }
+    .gallery-heading h3 { font-size:37px; font-weight:600; line-height:1.07; letter-spacing:-1.6px; margin:0; }
+    .gallery-heading p { font-size:9px; line-height:1.7; max-width:170px; margin:0; }
+    .product-grid { display:grid; grid-template-columns:1.2fr .93fr .84fr; grid-template-rows:140px 85px; gap:10px; }
+    .product { position:relative; overflow:hidden; border-radius:6px; padding:13px; }
+    .product-label { display:flex; justify-content:space-between; font-size:8px; position:relative; z-index:2; }
+    .product-label small { font:7px Consolas,monospace; }
+    .product-ads { background:#f1b8d1; color:#601b43; grid-row:span 2; }
+    .product-ads .ad-card { background:#faf477; color:#293421; width:158px; height:124px; padding:12px; margin:23px auto 0; transform:rotate(-7deg); box-shadow:10px 10px 0 #a84f75; border:1px solid #6b743d; }
+    .product-ads .ad-card small { font:7px Consolas,monospace; }
+    .product-ads .ad-card b { display:block; font-size:23px; line-height:1; letter-spacing:-.8px; margin:12px 0; }
+    .product-ads .ad-card span { font-size:7px; border-bottom:1px solid #516044; padding-bottom:3px; }
+    .product-ads .tech-line { position:absolute; bottom:13px; left:13px; font:7px Consolas,monospace; }
+    .product-map { background:#18415a; color:#e1f3ff; grid-row:span 2; padding:0; }
+    .product-map svg { display:block; width:100%; height:100%; position:absolute; }
+    .product-map .product-label { margin:13px; }
+    .product-map .map-label { position:absolute; left:12px; bottom:13px; background:#e4edff; color:#233a61; padding:7px 9px; font-size:8px; border-radius:3px; }
+    .product-qr { background:#3950d8; color:#fff; }
+    .product-qr .qr-flow { margin-top:23px; font:9px Consolas,monospace; line-height:2; }
+    .product-qr .qr-flow b { font-size:17px; display:block; font-family:"Segoe UI",Arial,sans-serif; letter-spacing:-.4px; }
+    .product-rebuild { background:#fff; color:#334267; }
+    .product-rebuild .before-after { display:flex; gap:10px; align-items:center; margin-top:10px; font:8px Consolas,monospace; color:#3e53d8; }
+    .product-rebuild .blocks { display:grid; gap:3px; grid-template-columns:repeat(2,12px); }
+    .product-rebuild .blocks i { height:10px; background:#8497ff; }
+    @media(max-width:1000px) { .board { width:calc(100% - 36px); } .directions { grid-template-columns:1fr; gap:22px; } .board-top { align-items:flex-start; flex-direction:column; gap:15px; } .board-top p { max-width:650px; } }
+    @media(max-width:480px) { .board { width:calc(100% - 24px); padding-top:24px; } .board-top h1 { font-size:29px; } .direction-title h2 { font-size:14px; } .direction-title,.direction-info { padding-inline:14px; } .board-bottom { flex-direction:column; gap:8px; } }
+    @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <div class="board-top"><div><span class="board-kicker">THUỲ DƯƠNG / PORTFOLIO ART DIRECTION</span><h1>Bốn hướng thiết kế mới.</h1></div><p>Phác thảo phần đầu trang để so sánh bố cục, màu sắc và cách nhấn mạnh chuyên môn. Hình sản phẩm bên dưới là minh hoạ thiết kế.</p></div>
+    <div class="directions">
+      <section class="direction" id="technical-atlas" aria-labelledby="atlas-title">
+        <div class="direction-title"><h2 id="atlas-title"><span>01</span>Technical Atlas</h2><div class="palette" aria-label="Navy, xanh điện và trắng"><i style="background:#0b1221"></i><i style="background:#77a9ff"></i><i style="background:#e9edf7"></i></div></div>
+        <div class="sketch"><div class="scene atlas" aria-label="Phác thảo giao diện kỹ thuật màu navy">
+          <div class="mini-nav"><span><span class="mark mono">td</span>Thuỳ Dương</span><span class="links"><span>Expertise</span><span>Projects</span><span>Contact ↗</span></span></div>
+          <div class="atlas-header"><div><small>FULLSTACK / SOFTWARE ENGINEER</small><h3>Building systems.<br>Connecting the layers.</h3></div><p>7 năm làm việc với sản phẩm web.<br>Laravel, Vue &amp; Svelte — từ kiến trúc đến vận hành.</p></div>
+          <div class="atlas-body"><div class="atlas-sidebar"><div class="label">CAPABILITY MAP</div><div class="item active"><span>Fullstack systems</span><span>↗</span></div><div class="item"><span>Interactive media</span><span>02</span></div><div class="item"><span>GIS &amp; data</span><span>03</span></div><div class="item"><span>System rebuild</span><span>04</span></div></div><div class="atlas-content"><div class="topline"><span>01 / TECHNICAL LAYERS</span><span>DESIGN → BUILD → OPERATE</span></div><div class="architecture"><div class="arch-node"><span class="node-label">INTERFACE</span><b>Web experience</b><small>Vue / Svelte</small></div><span class="connector">→</span><div class="arch-node"><span class="node-label">APPLICATION</span><b>Services &amp; API</b><small>Laravel / PHP</small></div><span class="connector">→</span><div class="arch-node"><span class="node-label">DATA</span><b>Storage &amp; cache</b><small>MySQL / Redis</small></div></div><div class="atlas-proof"><div><small>PROJECT EVIDENCE</small><b>Dynamic Shortlink &amp; QR Code</b><p>Thiết kế dữ liệu · Phát triển dịch vụ · Vận hành<br>Cập nhật URL đích mà không cần in lại QR.</p></div><span class="arrow">↗</span></div></div></div>
+        </div></div>
+        <div class="direction-info"><p><b>Khám phá năng lực qua bản đồ hệ thống.</b> Kéo và chọn các lớp giao diện, API, dữ liệu để xem công nghệ và dự án liên quan. Hợp với fullstack và rebuild.</p><p class="tradeoff">Cần có danh sách tóm tắt để người tuyển dụng đọc nhanh.</p></div>
+      </section>
+      <section class="direction" id="motion-studio" aria-labelledby="motion-title">
+        <div class="direction-title"><h2 id="motion-title"><span>02</span>Motion Studio</h2><div class="palette" aria-label="Burgundy, coral và vàng chanh"><i style="background:#251016"></i><i style="background:#ff836e"></i><i style="background:#e4ff70"></i></div></div>
+        <div class="sketch"><div class="scene motion" aria-label="Phác thảo phong cách studio chuyển động với chữ lớn">
+          <div class="mini-nav"><span class="logo"><i>✳</i> THUỲ DƯƠNG</span><span class="links"><span>Selected work</span><span>About</span><span>Let's talk ↗</span></span></div>
+          <div class="motion-main"><div><div class="kicker">FULLSTACK ENGINEER / INTERACTIVE MEDIA</div><h3>CODE IN<br><span class="outline">MOTION.</span></h3><p class="intro">Mình xây dựng sản phẩm web, core quảng cáo và trải nghiệm tương tác với Laravel, Vue &amp; Svelte.</p><div class="cta"><span>Explore selected work</span><span>↗</span></div></div><div class="motion-preview"><div class="campaign"><small>INTERACTIVE / RICH MEDIA</small><div class="campaign-title">MAKE<br>IT MOVE.</div><div class="orbital"></div><div class="campaign-bottom">Svelte · Animation · SVG</div></div><div class="campaign-label">CORE ADS / TEMPLATE</div><div class="campaign-control"><span>▶</span><span>SCROLL TIMELINE</span><span class="progress"></span><span>GSAP</span></div></div></div>
+          <div class="motion-ribbon">CORE ADS &nbsp; ✳ &nbsp; EMAGAZINE &nbsp; ✳ &nbsp; INTERACTIVE STORYTELLING &nbsp; ✳ &nbsp; WEB SYSTEMS</div>
+        </div></div>
+        <div class="direction-info"><p><b>Giao diện thể hiện kỹ năng tương tác.</b> Chữ lớn, chuyển động theo cuộn và preview quảng cáo đưa Core Ads, GSAP, SVG và Emagazine lên trước.</p><p class="tradeoff">Fullstack và GIS cần một phần riêng để vẫn có đủ trọng lượng.</p></div>
+      </section>
+      <section class="direction" id="scroll-experience" aria-labelledby="scroll-title">
+        <div class="direction-title"><h2 id="scroll-title"><span>03</span>Scroll Experience</h2><div class="palette" aria-label="Charcoal, tím và trắng"><i style="background:#121219"></i><i style="background:#b7a1f3"></i><i style="background:#eeeef6"></i></div></div>
+        <div class="sketch"><div class="scene scroll-story" aria-label="Phác thảo trải nghiệm kể chuyện theo cuộn qua từng chương dự án">
+          <div class="mini-nav"><span>THUỲ DƯƠNG / ENGINEER</span><span class="links"><span>Chapter 01 / 03</span><span>All projects ↗</span></span></div>
+          <div class="story-stage"><span class="ghost-num">01</span><div class="story-copy"><small>CHAPTER 01 / INTERACTIVE MEDIA</small><h3>One core.<br>Many formats.</h3><p>Cuộn để khám phá cách core quảng cáo chuyển từ component đến trải nghiệm trên nhiều thiết bị.</p></div><div class="story-preview"><div class="chrome"><span>● ● ● / ADS SIMULATOR</span><span>DESKTOP ↔ MOBILE</span></div><div class="story-ad">BUILT TO<br>ADAPT.<small>Svelte · Laravel · Vue</small></div><div class="ad-disc"></div></div><div class="story-rail"><span>01</span><span>02</span><span>03</span><span>SCROLL TO EXPLORE ↓</span></div></div>
+          <div class="story-timeline"><div>01 / CORE ADS</div><div>02 / GIS &amp; MAPS</div><div>03 / FULLSTACK SYSTEMS</div></div>
+        </div></div>
+        <div class="direction-info"><p><b>Mỗi dự án là một chương tương tác.</b> Cuộn để chuyển góc nhìn, thay đổi định dạng Ads, mở lớp GIS rồi khám phá luồng API và dữ liệu.</p><p class="tradeoff">Cần điều hướng trực tiếp để người xem có thể đến ngay chuyên môn họ quan tâm.</p></div>
+      </section>
+      <section class="direction" id="product-gallery" aria-labelledby="gallery-title">
+        <div class="direction-title"><h2 id="gallery-title"><span>04</span>Product Playground</h2><div class="palette" aria-label="Xanh nhạt, cobalt và hồng"><i style="background:#e4edff"></i><i style="background:#3950d8"></i><i style="background:#f1b8d1"></i></div></div>
+        <div class="sketch"><div class="scene gallery" aria-label="Phác thảo gallery sản phẩm với bố cục bất đối xứng">
+          <div class="mini-nav"><span class="logo"><span class="asterisk">✳</span>Thuỳ Dương</span><span class="links"><span>Work</span><span>Expertise</span><span>Contact ↗</span></span></div>
+          <div class="gallery-heading"><h3>Different products.<br>One engineering mindset.</h3><p>Fullstack / Software Engineer<br>7 năm · Laravel, Vue &amp; Svelte<br>Hà Nội, Việt Nam</p></div>
+          <div class="product-grid"><div class="product product-ads"><div class="product-label"><span>Core Ads</span><small>01 ↗</small></div><div class="ad-card"><small>RICH MEDIA</small><b>ONE CORE.<br>MANY ADS.</b><span>DESKTOP / MOBILE</span></div><div class="tech-line">Svelte · Laravel · Vue</div></div><div class="product product-map"><svg viewBox="0 0 200 225" aria-hidden="true"><g fill="none" stroke="#4a6f78" stroke-width="1"><path d="M-10 30Q40 100 120 40T210 80M-10 90Q60 20 100 120T210 170M-10 180Q90 70 150 200T210 180M35 -10Q5 80 90 230M150 -10Q220 100 130 230"/></g><path d="M0 215Q20 100 110 130T210 20" fill="none" stroke="#619fbb" stroke-width="10"/><g fill="#faf477"><circle cx="69" cy="142" r="5"/><circle cx="118" cy="125" r="5"/><circle cx="161" cy="82" r="5"/></g><path d="M60 55 100 37 136 72 119 112 70 96Z" fill="#a5d9ba" fill-opacity=".2" stroke="#a5d9ba" stroke-dasharray="3 3"/></svg><div class="product-label"><span>GIS &amp; Maps</span><small>02 ↗</small></div><div class="map-label">Leaflet · GeoJSON</div></div><div class="product product-qr"><div class="product-label"><span>Dynamic QR</span><small>03 ↗</small></div><div class="qr-flow">QR → Shortlink<b>Đổi điểm đến.<br>Giữ nguyên mã.</b></div></div><div class="product product-rebuild"><div class="product-label"><span>System rebuild</span><small>04 ↗</small></div><div class="before-after"><span>LEGACY</span><span>→</span><span class="blocks"><i></i><i></i><i></i><i></i></span></div></div></div>
+        </div></div>
+        <div class="direction-info"><p><b>Người xem thử sản phẩm ngay trong gallery.</b> Đổi kích thước Ads, bật lớp GIS, đổi URL QR hoặc kéo thanh so sánh trước và sau khi rebuild.</p><p class="tradeoff">Cần hình dự án hoặc demo đủ tốt; mỗi ô chỉ nên có một tương tác chính.</p></div>
+      </section>
+    </div>
+    <div class="board-bottom"><span>Bốn hướng phác thảo riêng để thảo luận; chưa áp dụng vào website.</span><span class="mono">THUỲ DƯƠNG / DESIGN EXPLORATION</span></div>
+  </main>
+  <script>
+    const observer = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        const scene = entry.target.querySelector('.scene');
+        scene.style.transform = 'scale(' + entry.contentRect.width / 720 + ')';
+      });
+    });
+    document.querySelectorAll('.sketch').forEach(sketch => observer.observe(sketch));
+  </script>
+</body>
+</html>
