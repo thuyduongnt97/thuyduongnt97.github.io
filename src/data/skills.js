@@ -2,6 +2,7 @@
 export const skills = [
   {
     icon: 'code',
+    featured: true,
     title: 'Frontend & Frameworks',
     sub: 'Giao diện hiện đại, responsive',
     description: 'Xây dựng giao diện với Vue và Svelte, quản lý state và tối ưu trải nghiệm trên nhiều kích thước màn hình.',
@@ -9,6 +10,7 @@ export const skills = [
   },
   {
     icon: 'zap',
+    featured: true,
     title: 'UI & Interactive Media',
     sub: 'Quảng cáo, chuyển động và kể chuyện',
     description: 'Thiết kế core template quảng cáo và lập trình Emagazine, kết hợp chuyển động với nội dung đa phương tiện.',
@@ -16,6 +18,7 @@ export const skills = [
   },
   {
     icon: 'map',
+    featured: true,
     title: 'Bản đồ & Trực quan dữ liệu',
     sub: 'Thông tin địa lý, nhiều lớp dữ liệu',
     description: 'Tích hợp bản đồ số, xử lý GeoJSON, layers và markers cho các cổng thông tin chuyên đề.',

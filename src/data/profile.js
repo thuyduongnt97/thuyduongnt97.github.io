@@ -65,28 +65,27 @@ export const profile = {
 // Metadata được Vite chèn vào HTML ở cả dev và build, dùng chung dữ liệu với giao diện.
 export const seo = {
   get title() {
-    return `${profile.name} — ${profile.title} | Laravel, Vue.js & Svelte`
+    return `${profile.name} — ${profile.title} | Frontend & Interactive Web`
   },
   get description() {
-    return `${profile.name} — ${profile.title} với ${profile.experienceYears} năm kinh nghiệm Laravel, Vue.js & Svelte. Core Ads, QR động, bản đồ GIS và tái cấu trúc hệ thống. ${recognition.professional.title} ${recognition.professional.years.join(', ')}.`
+    return `${profile.name} — ${profile.title}, ${profile.experienceYears} năm xây dựng sản phẩm web. Frontend Vue.js, Svelte, bản đồ SVG và landing page; nền tảng fullstack Laravel. ${recognition.professional.title} ${recognition.professional.years.join(', ')}.`
   },
   get socialTitle() {
     return `${profile.name} — ${profile.title}`
   },
   get socialDescription() {
-    return `Laravel • Vue.js • Svelte. ${profile.experienceYears} năm phát triển sản phẩm end-to-end; ${recognition.professional.years.length} năm đạt danh hiệu Nhân viên Xuất sắc.`
+    return `Frontend • Interactive Web • Vue.js • Svelte. ${profile.experienceYears} năm phát triển sản phẩm web; dự án, demo tương tác và landing page tiêu biểu.`
   },
   locale: 'vi_VN',
-  knowsAbout: ['Laravel', 'Vue.js', 'Svelte', 'PHP', 'MySQL', 'Redis', 'GIS', 'Leaflet', 'TypeScript', 'Core Ads Template', 'Legacy Refactoring'],
+  knowsAbout: ['Vue.js', 'Svelte', 'JavaScript', 'TypeScript', 'SVG', 'GSAP', 'CSS Animation', 'GIS', 'Leaflet', 'Laravel', 'PHP', 'MySQL', 'Redis', 'Core Ads Template', 'Legacy Refactoring'],
 }
 
 export const navLinks = [
   { id: 'about', label: 'Giới thiệu' },
-  { id: 'skills', label: 'Kỹ năng' },
+  { id: 'projects', label: 'Dự án & Demo' },
   { id: 'experience', label: 'Kinh nghiệm' },
-  { id: 'projects', label: 'Dự án' },
+  { id: 'skills', label: 'Kỹ năng' },
   { id: 'contact', label: 'Liên hệ' },
-  { id: 'showcase', label: 'Demo & Landing' },
 ]
 
 export const marquee = [

@@ -1,17 +1,16 @@
 <script setup>
 import BaseIcon from './BaseIcon.vue'
 import SectionHead from './SectionHead.vue'
-import { community, education, philosophy } from '../data/profile'
+import { community, education } from '../data/profile'
 </script>
 
 <template>
   <section id="education" aria-labelledby="edu-title">
     <div class="container">
       <SectionHead
-        eyebrow="06 — Nền tảng"
-        title="Học vấn &amp; tinh thần mã nguồn mở"
+        eyebrow="04 — Nền tảng"
+        title="Học vấn &amp; cộng đồng"
         title-id="edu-title"
-        sub="Nền tảng nghiên cứu, thực hành và chia sẻ kiến thức từ những năm đại học."
       />
       <div class="duo">
         <article v-reveal v-spotlight class="card info">
@@ -28,18 +27,6 @@ import { community, education, philosophy } from '../data/profile'
           <p class="info__label">{{ community.role }}</p>
           <p>{{ community.text }}</p>
         </article>
-      </div>
-      <div v-reveal class="card working-principles">
-        <div class="working-principles__heading">
-          <BaseIcon name="compass" />
-          <h3>{{ philosophy.title }}</h3>
-        </div>
-        <div>
-          <div class="values">
-            <span v-for="value in philosophy.values" :key="value" class="tag">{{ value }}</span>
-          </div>
-          <p>{{ philosophy.text }}</p>
-        </div>
       </div>
     </div>
   </section>

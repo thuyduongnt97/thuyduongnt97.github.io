@@ -1,10 +1,10 @@
 # Thêm landing page và demo tương tác
 
-Dữ liệu gallery nằm trong `src/data/showcase.js`. `landingPages` chứa các liên kết website; `interactiveDemos` chứa liên kết tới các demo tương tác. Showcase nằm cuối trang, sau phần Liên hệ và trước footer. Hai demo đã được đăng ký là **Cao tốc Bắc – Nam** và **Hầm đường bộ trên cao tốc Bắc – Nam**, mỗi demo có bản PC và Mobile riêng.
+Dữ liệu sản phẩm công khai nằm trong `src/data/showcase.js`. `landingPages` chứa các liên kết website; `interactiveDemos` chứa liên kết tới các demo tương tác. Các sản phẩm này nằm trong nhóm dự án `landing-pages` và `maps` ở phần **Dự án & demo**, ngay sau phần giới thiệu. Phần kinh nghiệm cũng dẫn tới các sản phẩm liên quan. Hai demo đã được đăng ký là **Cao tốc Bắc – Nam** và **Hầm đường bộ trên cao tốc Bắc – Nam**, mỗi demo có bản PC và Mobile riêng.
 
 ## Landing page
 
-Thêm một phần tử vào `landingPages` với các trường `id`, `title`, `url`, `description` và `category`. `id` phải duy nhất; `url` là địa chỉ đầy đủ của website. Chỉ ghi vai trò, công nghệ hoặc kết quả khi đã có thông tin xác nhận.
+Thêm một phần tử vào `landingPages` với các trường `id`, `title`, `url`, `description` và `category`. `id` phải duy nhất; `url` là địa chỉ đầy đủ của website. Nhóm dự án tự hiển thị mục mới từ danh sách này. Chỉ ghi vai trò, công nghệ hoặc kết quả khi đã có thông tin xác nhận.
 
 ## Chuẩn bị demo
 
@@ -110,6 +110,6 @@ Path đặt `pathLength="375"`, `stroke-dasharray="375"` và `stroke-dashoffset=
 
 ## Kiểm tra và xuất bản
 
-Chạy `npm run dev`, tới showcase cuối trang và mở từng demo trong tab riêng. Kiểm tra đường dẫn tài nguyên, thao tác tương tác và phiên bản được chọn trên máy tính, điện thoại. Khi cần xem thủ công bản còn lại, dùng tham số `view` như trên. Chạy `npm run build` trước khi commit để kiểm tra bản build portfolio.
+Chạy `npm run dev`, tới phần Dự án & demo và mở từng demo trong tab riêng. Kiểm tra đường dẫn tài nguyên, thao tác tương tác và phiên bản được chọn trên máy tính, điện thoại. Khi cần xem thủ công bản còn lại, dùng tham số `view` như trên. Chạy `npm run build` trước khi commit để kiểm tra bản build portfolio.
 
 Commit dữ liệu cùng toàn bộ tài nguyên demo rồi push lên nhánh `main`. Workflow `.github/workflows/deploy.yml` chạy `npm ci`, build portfolio và deploy thư mục `dist` lên GitHub Pages. Có thể xem kết quả tại tab Actions của repository; workflow cũng hỗ trợ chạy thủ công.
