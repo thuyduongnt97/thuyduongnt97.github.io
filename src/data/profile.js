@@ -82,9 +82,8 @@ export const seo = {
 
 export const navLinks = [
   { id: 'about', label: 'Giới thiệu' },
-  { id: 'projects', label: 'Dự án & Demo' },
-  { id: 'experience', label: 'Kinh nghiệm' },
   { id: 'skills', label: 'Kỹ năng' },
+  { id: 'experience', label: 'Kinh nghiệm & Dự án' },
   { id: 'contact', label: 'Liên hệ' },
 ]
 

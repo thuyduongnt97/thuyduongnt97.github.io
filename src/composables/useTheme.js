@@ -8,7 +8,7 @@ function apply(next) {
   document.documentElement.setAttribute('data-theme', next)
   document
     .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', next === 'light' ? '#f6f7fc' : '#0a0a14')
+    ?.setAttribute('content', next === 'light' ? '#f9fafb' : '#15181e')
 }
 
 apply(theme.value)

@@ -6,7 +6,6 @@ import AppNav from './components/AppNav.vue'
 import HeroSection from './components/HeroSection.vue'
 import SkillsSection from './components/SkillsSection.vue'
 import ExperienceSection from './components/ExperienceSection.vue'
-import ProjectsSection from './components/ProjectsSection.vue'
 import EducationSection from './components/EducationSection.vue'
 import ContactSection from './components/ContactSection.vue'
 import AppFooter from './components/AppFooter.vue'
@@ -21,9 +20,8 @@ import AppFooter from './components/AppFooter.vue'
 
   <main id="main">
     <HeroSection />
-    <ProjectsSection />
-    <ExperienceSection />
     <SkillsSection />
+    <ExperienceSection />
     <EducationSection />
     <ContactSection />
   </main>

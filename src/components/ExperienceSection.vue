@@ -1,193 +1,302 @@
 <script setup>
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import BaseIcon from './BaseIcon.vue'
-import ProductLinks from './ProductLinks.vue'
+import ProjectCard from './ProjectCard.vue'
 import SectionHead from './SectionHead.vue'
-import { job, universityExperience } from '../data/experience'
-import { agentMilestone, careerMilestones, careerOngoingWork, deliveryPhases } from '../data/career'
+import { experiences } from '../data/experiences'
+import { splitExperienceProjects } from '../utils/portfolio'
 
-const orderedMilestones = careerMilestones.map((milestone, index) => ({
-  ...milestone,
-  order: milestone.order ?? index + 1,
+const experienceGroups = experiences.map((experience) => ({
+  ...experience,
+  ...splitExperienceProjects(experience.projects),
 }))
-const phases = deliveryPhases.map((phase) => ({
-  ...phase,
-  milestones: orderedMilestones
-    .filter((milestone) => milestone.phase === phase.id)
-    .sort((a, b) => a.order - b.order),
-}))
-const agentMonth = agentMilestone.date
+const expandedExperienceIds = ref(new Set())
+const projectTransitions = new Map()
+const toggleRevisions = new Map()
+let reducedMotionQuery
+let mounted = false
+
+const kindLabels = {
+  ongoing: 'Công việc xuyên suốt',
+  research: 'Nghiên cứu & chuyển giao công nghệ',
+  support: 'Giai đoạn nền tảng',
+}
+
+const resetTransitionStyles = (element) => {
+  element.style.removeProperty('height')
+  element.style.removeProperty('opacity')
+  element.style.removeProperty('overflow')
+}
+
+const prepareExpand = (element) => {
+  // A cancelled leave keeps its current size, so reversing does not jump.
+  if (!element.style.height) element.style.height = '0px'
+  if (!element.style.opacity) element.style.opacity = '0'
+  element.style.overflow = 'hidden'
+}
+
+const finishProjectTransition = (element) => {
+  const transition = projectTransitions.get(element)
+  projectTransitions.delete(element)
+  resetTransitionStyles(element)
+  transition?.resolve(true)
+}
+
+const cancelProjectTransition = (element) => {
+  const transition = projectTransitions.get(element)
+  if (!transition) return
+
+  const height = element.getBoundingClientRect().height
+  const opacity = getComputedStyle(element).opacity
+  transition.animation.onfinish = null
+  transition.animation.cancel()
+  projectTransitions.delete(element)
+  element.style.height = height + 'px'
+  element.style.opacity = opacity
+  element.style.overflow = 'hidden'
+  transition.resolve(false)
+}
+
+const animateProjects = (element, done, expanding) => {
+  const startHeight = element.getBoundingClientRect().height
+  const startOpacity = Number.parseFloat(getComputedStyle(element).opacity)
+  // The inner grid's layout height excludes translated v-reveal children.
+  const endHeight = expanding ? element.firstElementChild.getBoundingClientRect().height : 0
+  const endOpacity = expanding ? 1 : 0
+  element.style.overflow = 'hidden'
+
+  if (reducedMotionQuery?.matches || !element.animate) {
+    done()
+    return
+  }
+
+  let resolve
+  const promise = new Promise((complete) => { resolve = complete })
+  const animation = element.animate(
+    [
+      { height: startHeight + 'px', opacity: startOpacity },
+      { height: endHeight + 'px', opacity: endOpacity },
+    ],
+    { duration: 280, easing: 'cubic-bezier(.22, 1, .36, 1)', fill: 'forwards' },
+  )
+  const transition = { animation, promise, resolve }
+  projectTransitions.set(element, transition)
+
+  animation.onfinish = () => {
+    if (projectTransitions.get(element) !== transition) return
+    element.style.height = endHeight + 'px'
+    element.style.opacity = String(endOpacity)
+    animation.onfinish = null
+    animation.cancel()
+    done()
+  }
+}
+
+const expandProjects = (element, done) => animateProjects(element, done, true)
+const collapseProjects = (element, done) => animateProjects(element, done, false)
+
+const waitForProjectTransition = (experienceId) => {
+  const element = document.getElementById('experience-extra-' + experienceId)
+  return projectTransitions.get(element)?.promise ?? Promise.resolve(true)
+}
+
+const onReducedMotionChange = ({ matches }) => {
+  if (matches) {
+    projectTransitions.forEach(({ animation }) => animation.finish())
+  }
+}
+
+const toggleExperience = async (experienceId, event) => {
+  const button = event.currentTarget
+  const focusAtToggle = document.activeElement
+  const revision = (toggleRevisions.get(experienceId) ?? 0) + 1
+  toggleRevisions.set(experienceId, revision)
+  const collapsing = expandedExperienceIds.value.has(experienceId)
+  if (collapsing) expandedExperienceIds.value.delete(experienceId)
+  else expandedExperienceIds.value.add(experienceId)
+
+  await nextTick()
+  if (!collapsing) return
+  const completed = await waitForProjectTransition(experienceId)
+  if (!completed || !mounted || toggleRevisions.get(experienceId) !== revision || expandedExperienceIds.value.has(experienceId)) return
+  // Keep a later keyboard/click interaction from having its focus taken back.
+  if (document.activeElement !== focusAtToggle && document.activeElement !== button && document.activeElement !== document.body) return
+
+  button.focus({ preventScroll: true })
+  const { top, bottom } = button.getBoundingClientRect()
+  const navBottom = document.querySelector('.nav')?.getBoundingClientRect().bottom ?? 0
+  if (top < navBottom + 12 || bottom > window.innerHeight - 12) {
+    button.scrollIntoView({ block: 'nearest' })
+  }
+}
+
+const revealLinkedProject = async () => {
+  const requestedHash = window.location.hash
+  let targetId
+  try {
+    targetId = decodeURIComponent(requestedHash.slice(1))
+  } catch {
+    return
+  }
+  if (!targetId.startsWith('project-')) return
+
+  const experience = experienceGroups.find((group) =>
+    group.projects.some((project) => 'project-' + project.id === targetId),
+  )
+  if (!experience) return
+
+  const additional = experience.additionalProjects.some((project) => 'project-' + project.id === targetId)
+  if (additional) expandedExperienceIds.value.add(experience.id)
+  await nextTick()
+  if (additional && !(await waitForProjectTransition(experience.id))) return
+  if (!mounted || window.location.hash !== requestedHash) return
+  document.getElementById(targetId)?.scrollIntoView({ block: 'start' })
+}
+
+onMounted(() => {
+  mounted = true
+  reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  reducedMotionQuery.addEventListener('change', onReducedMotionChange)
+  revealLinkedProject()
+  window.addEventListener('hashchange', revealLinkedProject)
+})
+onBeforeUnmount(() => {
+  mounted = false
+  window.removeEventListener('hashchange', revealLinkedProject)
+  reducedMotionQuery?.removeEventListener('change', onReducedMotionChange)
+  projectTransitions.forEach((transition, element) => {
+    transition.animation.onfinish = null
+    transition.animation.cancel()
+    resetTransitionStyles(element)
+    transition.resolve(false)
+  })
+  projectTransitions.clear()
+})
 </script>
 
 <template>
-  <section id="experience" aria-labelledby="exp-title">
+  <section id="experience" aria-labelledby="experience-title">
+    <span id="projects" class="experience-anchor" aria-hidden="true"></span>
+    <span id="showcase" class="experience-anchor" aria-hidden="true"></span>
     <div class="container">
       <SectionHead
-        eyebrow="02 — Kinh nghiệm"
-        title="Dòng thời gian phát triển sản phẩm"
-        title-id="exp-title"
+        eyebrow="02 — Kinh nghiệm & dự án"
+        title="Kinh nghiệm & dự án"
+        title-id="experience-title"
+        sub="Các dự án tiêu biểu theo từng giai đoạn làm việc. Demo và landing page được chọn lọc để chia sẻ công khai, đồng thời tôn trọng bảo mật thông tin của công ty."
       />
 
-      <div class="experience-current" role="group" aria-labelledby="current-job-title">
-        <div v-reveal class="experience-job">
-          <div>
-            <h3 id="current-job-title">{{ job.role }}</h3>
-            <p>{{ job.scope }} · {{ job.stageLabel }}</p>
-          </div>
-          <div class="experience-job__meta">
-            <span><BaseIcon name="calendar" /> {{ job.period }}</span>
-            <span><BaseIcon name="pin" /> {{ job.location }}</span>
-          </div>
-        </div>
-
-        <div class="career-phases">
-          <div
-            v-for="phase in phases"
-            :key="phase.id"
-            class="career-phase"
-            :class="{ 'career-phase--agents': phase.id === 'with-agents' }"
-            role="group"
-            :aria-labelledby="`career-phase-${phase.id}`"
-          >
-            <div class="career-phase__head">
-              <p v-if="phase.id !== 'with-agents'" class="career-phase__period">{{ phase.period }}</p>
-              <h3 :id="`career-phase-${phase.id}`">{{ phase.title }}</h3>
-              <div v-if="phase.id === 'with-agents'" id="agent-milestone" class="career-transition">
+      <div class="experience-list">
+        <article
+          v-for="experience in experienceGroups"
+          :key="experience.id"
+          class="experience-entry"
+          :class="'experience-entry--' + experience.kind"
+          :aria-labelledby="'experience-' + experience.id"
+        >
+          <header class="experience-entry__head">
+            <div v-reveal class="experience-entry__identity">
+              <p v-if="experience.period" class="experience-entry__period"><BaseIcon name="calendar" /> {{ experience.period }}</p>
+              <p v-if="kindLabels[experience.kind]" class="experience-entry__kind">{{ kindLabels[experience.kind] }}</p>
+              <h3 :id="'experience-' + experience.id">{{ experience.company }}</h3>
+              <p v-if="experience.role" class="experience-entry__role">{{ experience.role }}</p>
+              <p v-if="experience.location" class="experience-entry__location"><BaseIcon name="pin" /> {{ experience.location }}</p>
+              <p v-if="experience.summary" class="experience-entry__summary">{{ experience.summary }}</p>
+              <div v-if="experience.agentMilestone" id="agent-milestone" class="experience-agent">
                 <BaseIcon name="sparkle" />
-                <p><time :datetime="agentMonth">{{ agentMilestone.period }}</time> · {{ agentMilestone.label }}</p>
+                <p>
+                  <time :datetime="experience.agentMilestone.date">{{ experience.agentMilestone.period }}</time>
+                  · {{ experience.agentMilestone.label }}
+                </p>
               </div>
-              <p v-else class="career-phase__description">{{ phase.description }}</p>
             </div>
+          </header>
 
-            <ol class="career-timeline" role="list" :start="phase.milestones[0]?.order || 1" :aria-labelledby="`career-phase-${phase.id}`">
-              <li
-                v-for="(milestone, index) in phase.milestones"
-                :key="milestone.id"
-                v-reveal="index * 30"
-                class="career-milestone"
+          <div v-if="experience.projects.length" class="experience-entry__body">
+            <div class="experience-projects">
+              <ProjectCard v-for="project in experience.defaultProjects" :key="project.id" :project="project" />
+            </div>
+            <Transition
+              v-if="experience.additionalProjects.length"
+              :css="false"
+              @before-enter="prepareExpand"
+              @enter="expandProjects"
+              @after-enter="finishProjectTransition"
+              @enter-cancelled="cancelProjectTransition"
+              @leave="collapseProjects"
+              @after-leave="finishProjectTransition"
+              @leave-cancelled="cancelProjectTransition"
+            >
+              <div
+                v-show="expandedExperienceIds.has(experience.id)"
+                :id="'experience-extra-' + experience.id"
+                class="experience-extra"
+                role="region"
+                :aria-label="'Dự án khác tại ' + experience.company + ', ' + experience.period"
+                :aria-hidden="!expandedExperienceIds.has(experience.id)"
+                :inert="!expandedExperienceIds.has(experience.id)"
               >
-                <span class="career-milestone__number" aria-hidden="true">{{ String(milestone.order).padStart(2, '0') }}</span>
-                <article :aria-labelledby="`career-${milestone.id}`">
-                  <p v-if="milestone.period" class="career-milestone__period">{{ milestone.period }}</p>
-                  <h4 :id="`career-${milestone.id}`">{{ milestone.title }}</h4>
-                  <p class="career-milestone__description">{{ milestone.description }}</p>
-                  <div v-if="milestone.projects?.length" class="career-milestone__projects" role="group" aria-label="Dự án liên quan">
-                    <a v-for="project in milestone.projects" :key="project.id" :href="`#project-${project.id}`">
-                      {{ project.label }} <BaseIcon name="arrow" />
-                    </a>
-                  </div>
-                  <ProductLinks v-if="milestone.products?.length" :products="milestone.products" class="career-milestone__products" compact />
-                </article>
-              </li>
-            </ol>
-          </div>
-        </div>
-
-        <div v-if="careerOngoingWork.length" v-reveal class="card career-ongoing" role="group" aria-labelledby="career-ongoing-title">
-          <h3 id="career-ongoing-title">Công việc xuyên suốt</h3>
-          <div class="career-ongoing__rows">
-            <article v-for="item in careerOngoingWork" :key="item.id" :aria-labelledby="`career-ongoing-${item.id}`">
-              <h4 :id="`career-ongoing-${item.id}`">{{ item.title }}</h4>
-              <p>{{ item.description }}</p>
-              <div v-if="item.projects?.length" class="career-milestone__projects" role="group" aria-label="Dự án liên quan">
-                <a v-for="project in item.projects" :key="project.id" :href="`#project-${project.id}`">
-                  {{ project.label }} <BaseIcon name="arrow" />
-                </a>
+                <div class="experience-projects experience-projects--additional">
+                  <ProjectCard v-for="project in experience.additionalProjects" :key="project.id" :project="project" />
+                </div>
               </div>
-            </article>
+            </Transition>
+            <button
+              v-if="experience.additionalProjects.length"
+              class="btn btn--ghost experience-toggle"
+              type="button"
+              :aria-expanded="expandedExperienceIds.has(experience.id)"
+              :aria-controls="'experience-extra-' + experience.id"
+              @click="toggleExperience(experience.id, $event)"
+            >
+              <template v-if="expandedExperienceIds.has(experience.id)">Thu gọn</template>
+              <template v-else>Xem thêm +{{ experience.additionalProjects.length }} dự án khác tại {{ experience.company }}</template>
+              <BaseIcon class="experience-toggle__icon" name="chevron-down" />
+            </button>
           </div>
-        </div>
+        </article>
       </div>
-
-      <article v-reveal class="card experience-foundation" aria-labelledby="university-job-title">
-        <div class="experience-foundation__head">
-          <div>
-            <span class="experience-foundation__label">{{ universityExperience.stageLabel }}</span>
-            <h3 id="university-job-title">{{ universityExperience.organization }}</h3>
-            <p class="experience-foundation__role">{{ universityExperience.role }}</p>
-          </div>
-          <span class="experience-foundation__period">{{ universityExperience.period }}</span>
-        </div>
-        <div class="experience-foundation__work">
-          <p v-for="item in universityExperience.items" :key="item.title">
-            <strong>{{ item.title }}:</strong> {{ item.description }}
-          </p>
-        </div>
-        <div class="experience-earlier">
-          <span class="experience-earlier__dates">
-            <time :datetime="universityExperience.earlierSupport.start.date">{{ universityExperience.earlierSupport.start.label }}</time>
-            <span> — </span>
-            <time :datetime="universityExperience.earlierSupport.end.date">{{ universityExperience.earlierSupport.end.label }}</time>
-          </span>
-          <p><strong>{{ universityExperience.earlierSupport.title }}.</strong> {{ universityExperience.earlierSupport.description }}</p>
-        </div>
-      </article>
     </div>
   </section>
 </template>
 
 <style scoped>
-.experience-job { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.experience-job h3 { font-family: var(--font-display); font-size: 1.15rem; line-height: 1.35; letter-spacing: -.02em; }
-.experience-job p { margin-top: .25rem; color: var(--text-muted); font-size: .84rem; }
-.experience-job__meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem 1.1rem; color: var(--text-muted); font-size: .8rem; }
-.experience-job__meta > span { display: inline-flex; align-items: center; gap: .35rem; }
-.career-phases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 1.75rem; padding-top: .7rem; }
-.career-phase { min-width: 0; }
-.career-phase__head { min-height: 112px; padding-bottom: .8rem; border-bottom: 1px solid var(--border); }
-.career-phase__period { margin-bottom: .3rem; color: var(--text-faint); font-family: var(--font-mono); font-size: .7rem; line-height: 1.5; }
-.career-phase__head h3 { font-family: var(--font-display); font-size: 1.13rem; line-height: 1.35; letter-spacing: -.02em; }
-.career-phase__description { margin-top: .4rem; color: var(--text-muted); font-size: .8rem; line-height: 1.6; }
-.career-transition { display: flex; align-items: flex-start; gap: .5rem; margin-top: .65rem; padding: .55rem .65rem; border: 1px solid var(--border-strong); border-radius: 9px; background: var(--gradient-soft); scroll-margin-top: 6rem; }
-.career-transition > .icon { width: 1rem; height: 1rem; color: var(--cyan); margin-top: .1rem; }
-.career-transition p { font-size: .75rem; line-height: 1.55; color: var(--text-muted); }
-.career-transition time { color: var(--text); font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
-.career-timeline { position: relative; list-style: none; padding-top: .35rem; }
-.career-timeline::before { content: ''; position: absolute; left: .72rem; top: 1.2rem; bottom: 1.2rem; width: 1px; background: var(--border-strong); }
-.career-milestone { position: relative; min-width: 0; padding: .85rem 0 .85rem 2.25rem; }
-.career-milestone + .career-milestone { border-top: 1px solid var(--border); }
-.career-milestone__number { position: absolute; left: 0; top: .85rem; z-index: 1; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--surface-solid); color: var(--text-muted); font-family: var(--font-mono); font-size: .62rem; line-height: 1; }
-.career-phase--agents .career-milestone__number { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 35%, var(--border)); }
-.career-milestone__period { margin-bottom: .2rem; color: var(--cyan); font-family: var(--font-mono); font-size: .69rem; line-height: 1.5; }
-.career-milestone h4 { font-family: var(--font-display); font-size: .95rem; font-weight: 600; line-height: 1.4; letter-spacing: -.01em; overflow-wrap: anywhere; }
-.career-milestone__description { margin-top: .3rem; color: var(--text-muted); font-size: .82rem; line-height: 1.65; }
-.career-milestone__projects { display: flex; flex-wrap: wrap; gap: .25rem .8rem; margin-top: .4rem; }
-.career-milestone__projects a { display: inline-flex; align-items: center; gap: .3rem; color: var(--text-muted); font-size: .73rem; line-height: 1.5; font-weight: 500; padding-block: .2rem; transition: color .2s; }
-.career-milestone__projects a:hover { color: var(--cyan); }
-.career-milestone__projects .icon { width: .8rem; height: .8rem; }
-.career-milestone__products { margin-top: .5rem; }
-.career-ongoing { display: grid; grid-template-columns: 180px minmax(0, 1fr); align-items: start; gap: 1rem; margin-top: .85rem; padding: .9rem 1rem; }
-.career-ongoing > h3 { color: var(--cyan); font-family: var(--font-mono); font-size: .73rem; font-weight: 500; line-height: 1.6; }
-.career-ongoing__rows { min-width: 0; }
-.career-ongoing__rows article + article { margin-top: .7rem; padding-top: .7rem; border-top: 1px solid var(--border); }
-.career-ongoing__rows h4 { font-family: var(--font-display); font-size: .9rem; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
-.career-ongoing__rows p { margin-top: .25rem; color: var(--text-muted); font-size: .81rem; line-height: 1.6; }
-.experience-foundation__label { color: var(--cyan); font-family: var(--font-mono); font-size: .7rem; line-height: 1.5; }
-.experience-foundation { margin-top: 1rem; padding: 1.2rem; }
-.experience-foundation__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-.experience-foundation h3 { margin-top: .3rem; font-family: var(--font-display); font-size: 1rem; line-height: 1.45; letter-spacing: -.01em; }
-.experience-foundation__role { margin-top: .2rem; color: var(--text-muted); font-size: .8rem; }
-.experience-foundation__period { flex-shrink: 0; color: var(--text-muted); font-family: var(--font-mono); font-size: .73rem; padding-top: .15rem; }
-.experience-foundation__work { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem 1.5rem; margin-top: .8rem; }
-.experience-foundation__work p, .experience-earlier p { color: var(--text-muted); font-size: .81rem; line-height: 1.6; }
-.experience-foundation__work strong, .experience-earlier strong { color: var(--text); font-weight: 500; }
-.experience-earlier { display: flex; gap: 1.2rem; border-top: 1px solid var(--border); margin-top: .9rem; padding-top: .8rem; }
-.experience-earlier__dates { flex-shrink: 0; color: var(--text-faint); font-family: var(--font-mono); font-size: .7rem; padding-top: .1rem; }
-@media (max-width: 900px) {
-  .career-phases { grid-template-columns: 1fr; gap: 1.1rem; }
-  .career-phase__head { min-height: 0; }
-  .career-transition { max-width: 540px; }
-}
-@media (max-width: 760px) {
-  .experience-job { align-items: flex-start; flex-direction: column; gap: .55rem; }
-  .experience-job__meta { justify-content: flex-start; }
-  .career-ongoing { grid-template-columns: 1fr; gap: .4rem; }
-  .experience-foundation__work { grid-template-columns: 1fr; }
-  .experience-foundation__head { flex-direction: column; gap: .45rem; }
-  .experience-earlier { flex-direction: column; gap: .3rem; }
+.experience-anchor { display: block; height: 0; scroll-margin-top: calc(var(--nav-h) + 12px); }
+.experience-list { display: grid; gap: 3rem; }
+.experience-entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: clamp(1.5rem, 3vw, 2.5rem); min-width: 0; }
+.experience-entry + .experience-entry { padding-top: 3rem; border-top: 1px solid var(--border); }
+.experience-entry__head { position: sticky; top: calc(var(--nav-h) + 1.25rem); align-self: start; min-width: 0; padding-left: 1.15rem; border-left: 1px solid var(--border-strong); }
+.experience-entry__head::before { content: ''; position: absolute; top: .3rem; left: -5px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--bg); }
+.experience-entry__identity { min-width: 0; }
+.experience-entry__period { display: flex; align-items: flex-start; gap: .4rem; margin-bottom: .65rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .82rem; line-height: 1.6; }
+.experience-entry__period .icon, .experience-entry__location .icon { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .1rem; }
+.experience-entry__kind { margin-bottom: .25rem; color: var(--text-muted); font-family: var(--font-mono); font-size: .75rem; line-height: 1.5; }
+.experience-entry__head h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; line-height: 1.4; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.experience-entry__role { margin-top: .2rem; color: var(--text-muted); font-size: .88rem; line-height: 1.55; }
+.experience-entry__location { display: flex; align-items: flex-start; gap: .35rem; margin-top: .4rem; color: var(--text-muted); font-size: .82rem; line-height: 1.6; }
+.experience-entry__summary { margin-top: .75rem; color: var(--text-muted); font-size: .94rem; line-height: 1.75; }
+.experience-entry__body { min-width: 0; }
+.experience-agent { display: flex; align-items: flex-start; gap: .45rem; width: fit-content; max-width: 100%; margin-top: .65rem; padding: .55rem .7rem; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-soft); scroll-margin-top: 6rem; }
+.experience-agent > .icon { width: 1rem; height: 1rem; margin-top: .1rem; color: var(--accent); }
+.experience-agent p { color: var(--text-muted); font-size: .82rem; line-height: 1.55; }
+.experience-agent time { color: var(--text); font-family: var(--font-mono); font-weight: 500; white-space: nowrap; }
+.experience-projects { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.15rem; }
+.experience-projects--additional { padding-top: 1.15rem; }
+.experience-toggle { max-width: 100%; margin-top: 1rem; padding: .65rem .9rem; color: var(--accent); font-size: .86rem; text-align: left; line-height: 1.5; scroll-margin-top: calc(var(--nav-h) + 20px); }
+.experience-toggle__icon { flex-shrink: 0; transition: transform .2s; }
+.experience-toggle[aria-expanded="true"] .experience-toggle__icon { transform: rotate(180deg); }
+@media (max-width: 1024px) {
+  .experience-entry { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .experience-entry__head { position: relative; top: auto; }
 }
 @media (max-width: 560px) {
-  .career-milestone { padding-left: 2rem; }
-  .career-milestone__description { font-size: .8rem; }
-  .experience-foundation { padding: 1rem; }
+  .experience-list { gap: 1.75rem; }
+  .experience-entry + .experience-entry { padding-top: 1.75rem; border-top: 1px solid var(--border); }
+  .experience-entry__head h3 { font-size: 1.2rem; }
+  .experience-projects { gap: 1rem; }
+  .experience-projects--additional { padding-top: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experience-toggle__icon { transition: none; }
 }
 </style>

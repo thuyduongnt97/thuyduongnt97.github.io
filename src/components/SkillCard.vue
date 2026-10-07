@@ -22,12 +22,15 @@ defineProps({
 </template>
 
 <style scoped>
-.skill { padding: 1.15rem; }
-.skill__head { gap: .7rem; margin-bottom: .75rem; }
-.skill__icon { width: 36px; height: 36px; border-radius: 10px; }
-.skill__icon .icon { width: 1.1rem; height: 1.1rem; }
-.skill h3 { font-size: 1rem; line-height: 1.4; }
-.skill__description { font-size: .86rem; line-height: 1.6; margin-bottom: .9rem; }
-.chips { gap: .35rem; }
-.chip { padding: .25rem .5rem; font-size: .7rem; border-radius: 7px; }
+.skill { min-width: 0; padding: 1.4rem; overflow-wrap: anywhere; }
+.skill__head { display: flex; align-items: center; gap: .85rem; margin-bottom: 1rem; }
+.skill .skill__icon { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 10px; color: var(--accent); background: var(--bg-soft); box-shadow: none; }
+.skill__icon .icon { width: 1.15rem; height: 1.15rem; }
+.skill h3 { color: var(--text); font-size: 1.06rem; font-weight: 600; line-height: 1.5; }
+.skill__description { color: var(--text-muted); font-size: .94rem; line-height: 1.7; margin-bottom: 1.1rem; }
+.chips { gap: .45rem; }
+.chip { min-width: 0; max-width: 100%; padding: .3rem .6rem; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-soft); color: var(--text-muted); font-size: .77rem; line-height: 1.65; transition: color 180ms, border-color 180ms, background 180ms; }
+.chip:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 25%, var(--border)); background: color-mix(in srgb, var(--accent) 6%, var(--bg-soft)); transform: none; }
+@media (max-width: 560px) { .skill { padding: 1.1rem; } }
+@media (prefers-reduced-motion: reduce) { .chip { transition: none; } }
 </style>
