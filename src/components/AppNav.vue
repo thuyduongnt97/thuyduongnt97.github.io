@@ -2,13 +2,17 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import BaseIcon from './BaseIcon.vue'
 import { navLinks, profile } from '../data/profile'
+import { useCommandPalette } from '../composables/useCommandPalette'
 import { useScroll } from '../composables/useScroll'
 import { useScrollSpy } from '../composables/useScrollSpy'
 import { useTheme } from '../composables/useTheme'
 
 const { scrollY } = useScroll()
-const active = useScrollSpy()
+const active = useScrollSpy(navLinks.map((link) => link.id))
 const { theme, toggle } = useTheme()
+const { open: openCommandPalette } = useCommandPalette()
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)
 
 const open = ref(false)
 const menuEl = ref(null)
@@ -75,6 +79,18 @@ onBeforeUnmount(() => {
       </nav>
 
       <div class="nav__actions">
+        <!-- Quick Search Cmd+K Button -->
+        <button
+          class="nav__search-btn"
+          type="button"
+          aria-label="Mở tìm kiếm nhanh (Cmd + K)"
+          @click="openCommandPalette"
+        >
+          <BaseIcon name="search" class="nav__search-icon" />
+          <span class="nav__search-text">Tìm nhanh</span>
+          <kbd class="nav__search-kbd">{{ isMac ? '⌘K' : 'Ctrl K' }}</kbd>
+        </button>
+
         <a class="btn btn--primary btn--sm nav__cta" :href="profile.cvUrl" download>
           <BaseIcon name="download" /> Tải CV
         </a>
@@ -103,3 +119,55 @@ onBeforeUnmount(() => {
     </div>
   </header>
 </template>
+
+<style scoped>
+.nav__search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 180ms ease;
+  user-select: none;
+}
+
+.nav__search-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.nav__search-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--accent);
+}
+
+.nav__search-kbd {
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+@media (max-width: 640px) {
+  .nav__search-text,
+  .nav__search-kbd {
+    display: none;
+  }
+  .nav__search-btn {
+    padding: 0.45rem;
+    border-radius: 8px;
+  }
+}
+</style>

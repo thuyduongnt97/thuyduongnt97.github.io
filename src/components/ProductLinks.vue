@@ -2,12 +2,23 @@
 import BaseIcon from './BaseIcon.vue'
 import { resolveProjectUrl } from '../utils/portfolio'
 
-defineProps({
+const props = defineProps({
   links: { type: Array, required: true },
   compact: { type: Boolean, default: false },
 })
 
 const productCta = (link) => ({ demo: 'Mở demo', site: 'Xem website', github: 'Xem mã nguồn' })[link.kind]
+const productLabel = (link) => ({
+  'omo-gieo-trieu-mam-xanh': 'OMO',
+  athena: 'Athena',
+  'cao-toc-bac-nam': 'Cao tốc Bắc–Nam',
+  'ham-giao-thong': 'Hầm đường bộ',
+})[link.id] ?? link.label
+const productText = (link) => {
+  if (link.kind === 'github') return 'Mã nguồn'
+  if (props.compact && props.links.length === 1 && link.kind === 'demo' && link.id.endsWith('-demo')) return 'Demo'
+  return link.kind === 'demo' ? `Demo · ${productLabel(link)}` : `Xem ${productLabel(link)}`
+}
 </script>
 
 <template>
@@ -20,33 +31,29 @@ const productCta = (link) => ({ demo: 'Mở demo', site: 'Xem website', github: 
         rel="noopener noreferrer"
         :aria-label="`${productCta(link)}: ${link.label} (mở trong tab mới)`"
       >
-        <div class="product-link__info">
-          <strong>{{ link.label }}</strong>
-          <span v-if="!compact" class="product-link__category">
-            {{ link.category || (link.kind === 'demo' ? 'Interactive' : link.kind === 'github' ? 'Mã nguồn' : 'Website') }}
-            <template v-if="link.desktopUrl && link.mobileUrl"> · PC &amp; Mobile</template>
-          </span>
-        </div>
-        <span class="product-link__cta">{{ productCta(link) }} <BaseIcon name="external" /></span>
+        <span class="product-link__label">{{ productText(link) }}</span>
+        <BaseIcon name="external" />
       </a>
     </li>
   </ul>
 </template>
 
 <style scoped>
-.product-links { display: grid; gap: .65rem; }
-.product-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .85rem; padding: 1rem 1.05rem; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-soft); transition: border-color 180ms, background 180ms, box-shadow 200ms; }
-.product-link:hover, .product-link:focus-visible { border-color: color-mix(in srgb, var(--accent) 30%, var(--border-strong)); background: var(--surface-hover); box-shadow: var(--shadow-sm); }
-.product-link__info { min-width: 0; }
-.product-link__info strong { display: block; font-size: .94rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
-.product-link__category { display: block; margin-top: .2rem; color: var(--text-muted); font-size: .8rem; line-height: 1.6; }
-.product-link__cta { display: inline-flex; align-items: center; gap: .4rem; color: var(--accent); font-size: .85rem; font-weight: 600; line-height: 1.6; white-space: nowrap; }
-.product-link__cta .icon { width: 1rem; height: 1rem; }
-.product-links--compact .product-link { padding: .7rem .85rem; }
-.product-links--compact .product-link__info strong { font-size: .87rem; }
-@media (max-width: 480px) {
-  .product-link { grid-template-columns: 1fr; gap: .55rem; padding: .85rem; }
-  .product-link__cta { justify-self: end; }
+.product-links { display: flex; flex-wrap: wrap; align-items: flex-start; gap: .5rem; width: fit-content; min-width: 0; max-width: 100%; }
+.product-links > li { display: flex; min-width: 0; max-width: 100%; }
+.product-link { display: inline-flex; align-items: center; gap: .4rem; min-width: 0; max-width: 100%; padding: .375rem .75rem; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--accent); font-size: .8rem; font-weight: 500; line-height: 1.5; text-align: left; transition: color 200ms ease-out, border-color 200ms ease-out, background-color 200ms ease-out; }
+.product-link:hover, .product-link:focus-visible { border-color: var(--border-strong); background: var(--surface-hover); }
+.product-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.product-link__label { min-width: 0; overflow-wrap: anywhere; }
+.product-link > .icon { flex-shrink: 0; width: .9rem; height: .9rem; transition: transform 200ms ease-out; }
+.product-link:hover > .icon, .product-link:focus-visible > .icon, .project-card:hover .product-link > .icon, .project-card:focus-within .product-link > .icon { transform: translate(2px, -2px); }
+.product-links--compact .product-link { padding: .25rem .625rem; border-radius: 8px; background: var(--bg-soft); color: var(--project-result, var(--text-muted)); font-size: .75rem; }
+.product-links--compact .product-link:hover, .product-links--compact .product-link:focus-visible { border-color: var(--project-accent-hover-border, color-mix(in srgb, var(--accent) 30%, var(--border))); background: var(--project-accent-soft, color-mix(in srgb, var(--accent) 8%, var(--surface-solid))); color: var(--project-accent, var(--accent)); }
+.product-links--compact .product-link:focus-visible { outline-color: var(--project-accent, var(--accent)); }
+.product-links--compact .product-link > .icon { width: .75rem; height: .75rem; }
+@media (hover: none), (pointer: coarse) { .product-link { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) {
+  .product-link, .product-link > .icon { transition: none; }
+  .product-link:hover > .icon, .product-link:focus-visible > .icon, .project-card:hover .product-link > .icon, .project-card:focus-within .product-link > .icon { transform: none; }
 }
-@media (prefers-reduced-motion: reduce) { .product-link { transition: none; } }
 </style>

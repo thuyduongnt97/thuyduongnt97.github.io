@@ -2,6 +2,30 @@
 /** @typedef {import('../types/portfolio.js').ProjectLink} ProjectLink */
 
 /**
+ * Tách số liệu để nhấn mạnh khi render, giữ nguyên văn bản gốc của thành tựu.
+ * @param {string} achievement
+ * @returns {{ text: string, isMetric: boolean }[]}
+ */
+export function getAchievementSegments(achievement) {
+  const segments = []
+  const metrics = /(?<![\p{L}\p{N}_.,])[+-]?\d+(?:[.,]\d+)*(?:[ \u00a0\u202f]?%)?(?![\p{L}\p{N}_]|[.,]\d)/gu
+  let position = 0
+
+  for (const match of achievement.matchAll(metrics)) {
+    if (match.index > position) {
+      segments.push({ text: achievement.slice(position, match.index), isMetric: false })
+    }
+    segments.push({ text: match[0], isMetric: true })
+    position = match.index + match[0].length
+  }
+
+  if (position < achievement.length) {
+    segments.push({ text: achievement.slice(position), isMetric: false })
+  }
+  return segments
+}
+
+/**
  * Ưu tiên dự án nổi bật; nếu chưa đánh dấu thì hiển thị ba dự án đầu tiên.
  * @param {Project[]} projects
  * @returns {{ defaultProjects: Project[], additionalProjects: Project[] }}

@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 // State dùng chung toàn app (module-level) để mọi component đồng bộ.
-const theme = ref(document.documentElement.getAttribute('data-theme') || 'dark')
+const theme = ref(document.documentElement.getAttribute('data-theme') || 'light')
 
 function apply(next) {
   theme.value = next

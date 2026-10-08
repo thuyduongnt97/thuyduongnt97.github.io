@@ -2,7 +2,29 @@ import assert from 'node:assert/strict'
 import { existsSync } from 'node:fs'
 import test from 'node:test'
 import { experiences } from '../src/data/experiences.js'
-import { getProjectLinks, resolveProjectUrl, splitExperienceProjects } from '../src/utils/portfolio.js'
+import { getAchievementSegments, getProjectLinks, resolveProjectUrl, splitExperienceProjects } from '../src/utils/portfolio.js'
+
+test('achievement metrics emphasize quantities and percentages without changing the result text', () => {
+  const achievement = 'Giảm 32,5% thời gian xử lý; phục vụ 1.200 lượt và tăng +18 %.'
+  const segments = getAchievementSegments(achievement)
+  assert.equal(segments.map((segment) => segment.text).join(''), achievement)
+  assert.deepEqual(segments.filter((segment) => segment.isMetric).map((segment) => segment.text), ['32,5%', '1.200', '+18 %'])
+})
+
+test('achievement text without metrics and technology identifiers remain plain text', () => {
+  for (const achievement of ['Triển khai giao diện theo thiết kế.', 'Tích hợp HTML5 và Vue3.5.']) {
+    const segments = getAchievementSegments(achievement)
+    assert.equal(segments.map((segment) => segment.text).join(''), achievement)
+    assert.ok(segments.every((segment) => !segment.isMetric))
+  }
+})
+
+test('achievement segmentation preserves literal markup as text for Vue interpolation', () => {
+  const achievement = '<b>50%</b> & "2" kết quả'
+  const segments = getAchievementSegments(achievement)
+  assert.equal(segments.map((segment) => segment.text).join(''), achievement)
+  assert.deepEqual(segments.filter((segment) => segment.isMetric).map((segment) => segment.text), ['50%', '2'])
+})
 
 const findExperience = (id) => experiences.find((experience) => experience.id === id)
 const findProject = (id) => experiences.flatMap((experience) => experience.projects).find((project) => project.id === id)

@@ -6,7 +6,9 @@ import { recognition } from './recognition.js'
 export const profile = {
   name: 'Thuỳ Dương',
   initial: 'D',
-  title: 'Engineering Developer',
+  title: 'Senior Frontend Developer / UI-UX Engineer',
+  heroTitle: 'Senior Frontend Developer / UI-UX Engineer',
+  availability: 'Available for new opportunities',
   roleSummary: 'Fullstack / Software Engineer',
   city: 'Hà Nội',
   country: 'Việt Nam',
@@ -41,13 +43,13 @@ export const profile = {
     return `<strong>${this.experienceYears} năm</strong> làm chủ sản phẩm web <strong>từ kiến trúc đến vận hành</strong>. Chuyên sâu <strong>Laravel, Vue.js &amp; Svelte</strong> — từ core quảng cáo, QR động và bản đồ GIS đến tái cấu trúc hệ thống nội bộ.`
   },
 
-  // Các số liệu dựa trên nội dung CV: 6 mảng công việc và 2 landing page giao thông.
+  // Sáu mảng công việc trong hồ sơ; hai bài giao thông có demo riêng cho PC/mobile.
   get stats() {
     return [
-      { to: this.experienceYears, suffix: '', label: 'Năm kinh nghiệm thực chiến' },
-      { to: recognition.professional.years.length, suffix: '', label: 'Năm đạt danh hiệu Nhân viên Xuất sắc' },
-      { to: 6, suffix: '', label: 'Mảng sản phẩm đã phụ trách' },
-      { to: 2, suffix: '', label: 'Landing page dữ liệu giao thông' },
+      { to: this.experienceYears, suffix: '', label: 'Năm kinh nghiệm' },
+      { to: recognition.professional.years.length, suffix: '', label: 'Năm Nhân viên Xuất sắc' },
+      { to: 6, suffix: '', label: 'Mảng sản phẩm phụ trách' },
+      { to: 2, suffix: '', label: 'Demo interactive PC & Mobile' },
     ]
   },
   codeStack: {

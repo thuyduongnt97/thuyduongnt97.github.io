@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Title, SEO và JSON-LD được sinh từ src/data/profile.js bởi Vite. -->
-  <meta name="theme-color" content="#15181e">
+  <meta name="theme-color" content="#f8fafc">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -23,8 +23,9 @@
       d.classList.add('js');
       var t;
       try { t = localStorage.getItem('theme'); } catch (e) { }
-      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      if (t !== 'light' && t !== 'dark') t = 'light';
       d.setAttribute('data-theme', t);
+      d.querySelector('meta[name="theme-color"]').setAttribute('content', t === 'light' ? '#f8fafc' : '#15181e');
     })();
   </script>
 
