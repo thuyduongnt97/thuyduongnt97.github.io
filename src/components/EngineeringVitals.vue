@@ -55,7 +55,7 @@ const technicalStandards = [
   },
   {
     icon: 'code',
-    title: '22/22 Automated Tests Passed',
+    title: '26/26 Automated Tests Passed',
     desc: 'Hệ thống test suite tự động với Node.js test runner kiểm định hợp đồng dữ liệu, bộ lọc dự án và cơ chế spotlight pointer.',
   },
 ]

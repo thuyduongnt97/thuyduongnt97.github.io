@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 import IconSprite from './components/IconSprite.vue'
 import ScrollProgress from './components/ScrollProgress.vue'
 import BackgroundFx from './components/BackgroundFx.vue'
@@ -8,10 +9,16 @@ import ProjectLightboxModal from './components/ProjectLightboxModal.vue'
 import HeroSection from './components/HeroSection.vue'
 import SkillsSection from './components/SkillsSection.vue'
 import ExperienceSection from './components/ExperienceSection.vue'
+import CareerTimeline from './components/CareerTimeline.vue'
 import EducationSection from './components/EducationSection.vue'
 import ContactSection from './components/ContactSection.vue'
 import EngineeringVitals from './components/EngineeringVitals.vue'
 import AppFooter from './components/AppFooter.vue'
+import { forceUnlockScroll } from './utils/scrollLock.js'
+
+onMounted(() => {
+  forceUnlockScroll()
+})
 </script>
 
 <template>
@@ -27,6 +34,7 @@ import AppFooter from './components/AppFooter.vue'
     <HeroSection />
     <SkillsSection />
     <ExperienceSection />
+    <CareerTimeline />
     <EducationSection />
     <EngineeringVitals />
     <ContactSection />

@@ -5,6 +5,7 @@ import { profile } from '../data/profile'
 import { useAccent } from '../composables/useAccent'
 import { useCommandPalette } from '../composables/useCommandPalette'
 import { useTheme } from '../composables/useTheme'
+import { lockScroll, unlockScroll, forceUnlockScroll } from '../utils/scrollLock.js'
 
 const { isOpen, close, toggle, setActiveFilter, toastMessage, showToast } = useCommandPalette()
 const { accents, currentAccent, setAccent } = useAccent()
@@ -52,10 +53,11 @@ function handleAccent(accentId, label) {
 const commandItems = [
   // 1. Quick Navigation to Sections
   { id: 'sec-hero', title: 'Về tôi (Giới thiệu & Định vị)', category: 'Chuyển nhanh Section', icon: 'sparkle', action: () => scrollToSection('hero') },
-  { id: 'sec-exp', title: 'Kinh nghiệm & Dự án (Visual Case Studies)', category: 'Chuyển nhanh Section', icon: 'briefcase', action: () => scrollToSection('experience') },
   { id: 'sec-skills', title: 'Kỹ năng chuyên môn (Bento Architecture)', category: 'Chuyển nhanh Section', icon: 'code', action: () => scrollToSection('skills') },
-  { id: 'sec-vitals', title: 'Thước đo chất lượng (Core Web Vitals & Clean Code)', category: 'Chuyển nhanh Section', icon: 'zap', action: () => scrollToSection('engineering-vitals', '⚡ Khám phá chỉ số Core Web Vitals') },
+  { id: 'sec-exp', title: 'Dự án tiêu biểu (Visual Case Studies)', category: 'Chuyển nhanh Section', icon: 'layers', action: () => scrollToSection('experience') },
+  { id: 'sec-timeline', title: 'Lịch sử sự nghiệp (Career Timeline & Milestones)', category: 'Chuyển nhanh Section', icon: 'briefcase', action: () => scrollToSection('timeline') },
   { id: 'sec-edu', title: 'Học vấn & Bằng cấp', category: 'Chuyển nhanh Section', icon: 'cap', action: () => scrollToSection('education') },
+  { id: 'sec-vitals', title: 'Thước đo chất lượng (Core Web Vitals & Clean Code)', category: 'Chuyển nhanh Section', icon: 'zap', action: () => scrollToSection('engineering-vitals', '⚡ Khám phá chỉ số Core Web Vitals') },
   { id: 'sec-contact', title: 'Liên hệ & Hợp tác', category: 'Chuyển nhanh Section', icon: 'mail', action: () => scrollToSection('contact') },
 
   // 2. Tech Stack Filter & Deep-links
@@ -150,9 +152,9 @@ watch(isOpen, async (val) => {
       listBodyEl.value.scrollTo({ top: 0, behavior: 'auto' })
     }
     inputEl.value?.focus()
-    document.body.style.overflow = 'hidden'
+    lockScroll()
   } else {
-    document.body.style.overflow = ''
+    unlockScroll()
     if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
       previousActiveElement.focus()
     }
@@ -210,11 +212,14 @@ function onKeyDown(e) {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeyDown)
+  if (!isOpen.value) {
+    forceUnlockScroll()
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeyDown)
-  document.body.style.overflow = ''
+  forceUnlockScroll()
 })
 </script>
 

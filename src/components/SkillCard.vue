@@ -3,6 +3,7 @@ import BaseIcon from './BaseIcon.vue'
 
 defineProps({
   skill: { type: Object, required: true },
+  fullWidth: { type: Boolean, default: false },
 })
 </script>
 
@@ -11,6 +12,7 @@ defineProps({
     v-reveal
     v-spotlight
     class="card card--spotlight-layer bento-card"
+    :class="{ 'bento-card--full': fullWidth || skill.type === 'highlights' }"
     :aria-label="skill.title"
   >
     <div class="card-spotlight" aria-hidden="true" />
@@ -25,8 +27,16 @@ defineProps({
     </header>
 
     <div v-if="skill.type === 'highlights' || skill.highlights" class="bento-card__body">
-      <ul class="bento-highlights" role="list" :aria-label="skill.title">
-        <li v-for="(item, idx) in skill.highlights" :key="idx" class="bento-highlight-item">
+      <ul class="bento-highlights grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4" role="list" :aria-label="skill.title">
+        <li
+          v-for="(item, idx) in skill.highlights"
+          :key="idx"
+          class="bento-highlight-item"
+          :class="[
+            idx < 3 ? 'lg:col-span-2' : 'lg:col-span-3',
+            idx === 4 ? 'md:col-span-2 lg:col-span-3' : ''
+          ]"
+        >
           <span class="bento-highlight-bullet" aria-hidden="true">
             <BaseIcon name="check" />
           </span>
@@ -57,6 +67,7 @@ defineProps({
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100%;
   padding: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -79,6 +90,10 @@ defineProps({
   border-color: var(--border-strong);
 }
 
+.bento-card--full {
+  padding: 1.5rem 1.75rem;
+}
+
 .bento-card__head {
   display: flex;
   align-items: flex-start;
@@ -93,9 +108,9 @@ defineProps({
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: #eef2ff;
-  color: #4f46e5;
-  border: 1px solid #e0e7ff;
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
 }
 
 .bento-card__icon .icon {
@@ -103,18 +118,12 @@ defineProps({
   height: 1.25rem;
 }
 
-[data-theme="dark"] .bento-card__icon {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border-color: rgba(99, 102, 241, 0.25);
-}
-
 .bento-card__titles {
   min-width: 0;
 }
 
 .bento-card__title {
-  color: #0f172a;
+  color: var(--text);
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
@@ -123,19 +132,11 @@ defineProps({
   overflow-wrap: anywhere;
 }
 
-[data-theme="dark"] .bento-card__title {
-  color: var(--text);
-}
-
 .bento-card__subtitle {
   margin-top: 0.2rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.8125rem;
   line-height: 1.45;
-}
-
-[data-theme="dark"] .bento-card__subtitle {
-  color: var(--text-muted);
 }
 
 .bento-card__body {
@@ -143,83 +144,70 @@ defineProps({
   min-width: 0;
 }
 
-/* Bento Badges / Pills: bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-semibold inline-block m-1 */
+/* Bento Badges / Pills */
 .bento-pills {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  margin: -0.25rem;
+  gap: 0.5rem;
 }
 
 .bento-pill {
   display: inline-flex;
   align-items: center;
-  margin: 0.25rem;
-  padding: 0.375rem 0.75rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 0.5rem;
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.4;
-  background: #eef2ff;
-  color: #4338ca;
-  border: 1px solid #e0e7ff;
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
   overflow-wrap: anywhere;
   transition: transform 150ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .bento-pill:hover {
   transform: translateY(-1px);
-  background: #e0e7ff;
-  color: #3730a3;
-  border-color: #c7d2fe;
-}
-
-[data-theme="dark"] .bento-pill {
-  background: rgba(99, 102, 241, 0.12);
-  color: #a5b4fc;
-  border-color: rgba(99, 102, 241, 0.24);
-}
-
-[data-theme="dark"] .bento-pill:hover {
-  background: rgba(99, 102, 241, 0.22);
-  color: #c7d2fe;
+  background: var(--bg-soft);
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 /* Card Thế mạnh thực chiến: Bullet Points */
-.bento-highlights {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
 .bento-highlight-item {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-soft) 60%, transparent);
+  border: 1px solid var(--border);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.bento-highlight-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--interactive-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .bento-highlight-bullet {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 9999px;
-  background: #eef2ff;
-  color: #4338ca;
-  border: 1px solid #e0e7ff;
-  margin-top: 0.15rem;
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
+  margin-top: 0.1rem;
 }
 
 .bento-highlight-bullet .icon {
   width: 0.75rem;
   height: 0.75rem;
-}
-
-[data-theme="dark"] .bento-highlight-bullet {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border-color: rgba(99, 102, 241, 0.25);
 }
 
 .bento-highlight-content {
@@ -228,25 +216,17 @@ defineProps({
 
 .bento-highlight-title {
   display: block;
-  color: #0f172a;
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.4;
 }
 
-[data-theme="dark"] .bento-highlight-title {
-  color: var(--text);
-}
-
 .bento-highlight-desc {
-  margin-top: 0.15rem;
-  color: #64748b;
+  margin-top: 0.2rem;
+  color: var(--text-muted);
   font-size: 0.8125rem;
   line-height: 1.5;
-}
-
-[data-theme="dark"] .bento-highlight-desc {
-  color: var(--text-muted);
 }
 
 @media (max-width: 640px) {
@@ -254,10 +234,13 @@ defineProps({
     padding: 1.25rem;
     border-radius: 14px;
   }
+  .bento-card--full {
+    padding: 1.25rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bento-card, .bento-pill {
+  .bento-card, .bento-pill, .bento-highlight-item {
     transition: none;
   }
 }

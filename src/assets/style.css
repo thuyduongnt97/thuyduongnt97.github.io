@@ -1,3 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: var(--surface-solid);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-main: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-interactive-accent: var(--interactive-accent);
+  --color-interactive-soft: var(--interactive-soft);
+  --color-interactive-border: var(--interactive-border);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
 /* =========================================================
    Thuỳ Dương — Portfolio
    Design tokens → base → layout → components → utilities
@@ -47,7 +65,7 @@
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 20px;
-  --container: 1160px;
+  --container: 1280px;
   --nav-h: 64px;
   --ease: cubic-bezier(.22, 1, .36, 1);
 }
@@ -157,7 +175,21 @@
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 12px); -webkit-text-size-adjust: 100%; }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 12px);
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Khóa cuộn trang nền khi mở popup/modal */
+html.modal-open,
+body.modal-open {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
 
 body {
   font-family: var(--font-sans);
@@ -168,10 +200,31 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
   transition: background-color .2s ease, color .2s ease;
 }
 
-[hidden] { display: none !important; }
+@supports (overflow: clip) {
+  html, body {
+    overflow-x: clip;
+  }
+}
+
+[hidden], .hidden { display: none !important; }
+
+@media (min-width: 768px) {
+  .md\:block { display: block !important; }
+  .md\:flex { display: flex !important; }
+  .md\:hidden { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:block { display: block !important; }
+  .lg\:flex { display: flex !important; }
+  .lg\:hidden { display: none !important; }
+}
+
 img, svg { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; transition: color 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; transition: color 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out; }
@@ -192,7 +245,7 @@ ul { list-style: none; }
 }
 .skip-link:focus { top: 14px; }
 
-.container { width: min(100% - 2.5rem, var(--container)); margin-inline: auto; }
+.container { width: min(100% - 4rem, var(--container)); margin-inline: auto; }
 
 /* ---------- Background ---------- */
 .bg-fx { display: none; }
@@ -267,16 +320,16 @@ ul { list-style: none; }
 .btn--sm { --pad-y: .6rem; padding-inline: 1.1rem; font-size: .88rem; border-radius: 12px; }
 
 /* ---------- Sections ---------- */
-section { padding-block: clamp(2.25rem, 5vw, 3.5rem); position: relative; }
+section { padding-block: clamp(1.75rem, 3.2vw, 2.75rem); position: relative; }
 
-.section-head { max-width: 720px; margin-bottom: 1.75rem; }
+.section-head { max-width: 840px; margin-bottom: 1.25rem; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--cyan); margin-bottom: .5rem;
+  color: var(--cyan); margin-bottom: .35rem;
 }
 .eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--cyan); border-radius: 2px; }
 .section-title { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.2; letter-spacing: -.025em; font-weight: 700; }
-.section-sub { color: var(--text-muted); margin-top: .75rem; font-size: .96rem; line-height: 1.75; }
+.section-sub { color: var(--text-muted); margin-top: .35rem; font-size: .96rem; line-height: 1.6; }
 
 .gradient-text { color: var(--violet); }
 
@@ -521,14 +574,14 @@ section { padding-block: clamp(2.25rem, 5vw, 3.5rem); position: relative; }
 .working-principles p { color: var(--text-muted); font-size: .88rem; }
 
 /* ---------- Contact ---------- */
-.contact { padding-bottom: clamp(2.25rem, 5vw, 3.5rem); }
+.contact { padding-bottom: clamp(1.75rem, 3.2vw, 2.75rem); }
 .cta {
-  position: relative; text-align: center; padding: clamp(1.75rem, 4vw, 2.75rem) 1.5rem; border-radius: 16px;
+  position: relative; text-align: center; padding: clamp(1.5rem, 3.2vw, 2.25rem) 1.5rem; border-radius: 16px;
   border: 1px solid var(--border); background: var(--surface-solid); box-shadow: var(--shadow-sm);
 }
 .cta::before { content: none; }
-.cta h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.03em; line-height: 1.2; margin-bottom: .75rem; }
-.cta p { color: var(--text-muted); max-width: 62ch; margin: 0 auto 1.5rem; font-size: .96rem; line-height: 1.75; }
+.cta h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.03em; line-height: 1.2; margin-bottom: .6rem; }
+.cta p { color: var(--text-muted); max-width: 62ch; margin: 0 auto 1.25rem; font-size: .96rem; line-height: 1.65; }
 .cta__row { display: flex; flex-wrap: wrap; gap: .65rem; justify-content: center; }
 
 /* ---------- Footer ---------- */
@@ -569,6 +622,10 @@ section { padding-block: clamp(2.25rem, 5vw, 3.5rem); position: relative; }
   .nav__link { padding: .8rem 1rem; border-radius: 12px; }
 }
 
+@media (max-width: 1024px) {
+  .container { width: min(100% - 3rem, var(--container)); }
+}
+
 @media (max-width: 900px) {
   .tl-head__meta { margin-left: 0; }
 }
@@ -585,11 +642,11 @@ section { padding-block: clamp(2.25rem, 5vw, 3.5rem); position: relative; }
 
 @media (max-width: 640px) {
   .nav__cta { display: none; }
+  .container { width: min(100% - 2rem, var(--container)); }
 }
 
 @media (max-width: 560px) {
-  section { padding-block: 2.25rem; }
-  .container { width: min(100% - 1.75rem, var(--container)); }
+  section { padding-block: 1.75rem; }
   .stats { gap: .75rem; }
   .stat { padding: 1.1rem; }
   .float-chip--1 { right: 6px; }

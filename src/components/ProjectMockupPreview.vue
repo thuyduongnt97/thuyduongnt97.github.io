@@ -49,7 +49,8 @@ const mockupUrl = computed(() => {
         <span class="mockup-url-text">{{ mockupUrl }}</span>
       </div>
       <div class="mockup-badge">
-        <span class="pulse-indicator" /> Live Mockup
+        <span class="pulse-indicator" />
+        {{ project.videoUrl ? 'Video Demo' : (project.demoUrl ? 'Live Demo' : 'Live Mockup') }}
       </div>
     </div>
 
@@ -65,8 +66,36 @@ const mockupUrl = computed(() => {
       @keydown.space.prevent="handleScreenClick"
     >
       <div class="mockup-screen__inner">
+        <!-- 0. Video / GIF Demo Autoplay Support (Muted Autoplay Loop) -->
+        <div v-if="project.videoUrl" class="preview-media-player">
+          <video
+            :src="project.videoUrl"
+            autoplay
+            muted
+            loop
+            playsinline
+            class="mockup-video-element"
+            :aria-label="`Video demo mô phỏng cho ${project.name}`"
+          />
+          <div class="media-live-tag">
+            <span class="pulse-indicator" /> Video Autoplay
+          </div>
+        </div>
+
+        <div v-else-if="project.gifUrl || (project.imageUrl && !lightbox)" class="preview-media-player">
+          <img
+            :src="project.gifUrl || project.imageUrl"
+            :alt="`Demo giao diện cho ${project.name}`"
+            class="mockup-media-img"
+            loading="lazy"
+          />
+          <div class="media-live-tag">
+            <span class="pulse-indicator" /> Motion Demo
+          </div>
+        </div>
+
         <!-- 1. LANDING PAGES: OMO & ATHENA -->
-        <div v-if="project.id === 'landing-pages'" class="preview-landing">
+        <div v-else-if="project.id === 'landing-pages'" class="preview-landing">
         <div class="preview-landing__nav">
           <div class="preview-brand">
             <span class="preview-logo-dot" />
@@ -338,9 +367,14 @@ const mockupUrl = computed(() => {
 
 /* Mini Thumbnail Mode for Compact Cards */
 .project-mockup.is-mini {
-  border-radius: 12px;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
   box-shadow: none;
-  border-color: var(--border);
+  border: none;
 }
 
 .project-mockup.is-mini:hover {
@@ -349,6 +383,7 @@ const mockupUrl = computed(() => {
 }
 
 .project-mockup.is-mini .mockup-bar {
+  flex: 0 0 auto;
   padding: 0.35rem 0.65rem;
 }
 
@@ -368,11 +403,91 @@ const mockupUrl = computed(() => {
 }
 
 .project-mockup.is-mini .mockup-screen {
-  min-height: 105px;
-  max-height: 115px;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
   padding: 0.55rem;
   overflow: hidden;
   justify-content: flex-start;
+}
+
+/* Featured Preview Aspect Ratio 16/10 & object-fit */
+.project-mockup:not(.is-mini):not(.is-lightbox) {
+  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-mockup:not(.is-mini):not(.is-lightbox) .mockup-bar {
+  flex: 0 0 auto;
+}
+
+.project-mockup:not(.is-mini):not(.is-lightbox) .mockup-screen {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.project-mockup:not(.is-mini):not(.is-lightbox) .mockup-screen__inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.project-mockup img,
+.mockup-screen img,
+.mockup-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.preview-media-player {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mockup-video-element,
+.mockup-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-live-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  color: #38bdf8;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 5;
 }
 
 .project-mockup.is-mini .preview-hero-title,

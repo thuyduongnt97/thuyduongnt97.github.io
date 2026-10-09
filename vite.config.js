@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import { education, profile, seo } from './src/data/profile.js'
 import { recognition } from './src/data/recognition.js'
@@ -56,5 +57,5 @@ function profileMetadata() {
 // Nếu sau này đổi sang project site (vd. /ten-repo/) thì sửa base tương ứng.
 export default defineConfig({
   base: '/',
-  plugins: [vue(), profileMetadata()],
+  plugins: [tailwindcss(), vue(), profileMetadata()],
 })

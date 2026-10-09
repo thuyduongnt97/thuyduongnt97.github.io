@@ -17,17 +17,6 @@ watch(activeFilter, (newFilter) => {
   }
 })
 
-// Career Milestones
-const careerMilestones = experiences.map((exp) => ({
-  id: exp.id,
-  company: exp.company,
-  role: exp.role,
-  period: exp.period,
-  summary: exp.summary,
-  kind: exp.kind,
-  agentMilestone: exp.agentMilestone,
-}))
-
 // Flat project collection with company attribution
 const allProjects = computed(() => {
   return experiences.flatMap((exp) =>
@@ -191,62 +180,17 @@ onBeforeUnmount(() => {
     <span id="projects" class="experience-anchor" aria-hidden="true" />
     <span id="showcase" class="experience-anchor" aria-hidden="true" />
 
-    <div class="container">
+    <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Section Header -->
       <SectionHead
-        eyebrow="02 — Kinh nghiệm & dự án"
-        title="Visual Case Studies & Dự án"
+        eyebrow="02 — Dự án &amp; Case Studies"
+        title="Visual Case Studies &amp; Dự án thực tế"
         title-id="experience-title"
         sub="Tổng hợp các dự án kỹ thuật tiêu biểu theo dạng Case Study: Thách thức kiến trúc, giải pháp Frontend và tác động định lượng thực tế."
       />
 
-      <!-- Career Journey Roadmap / Milestones Overview -->
-      <div class="career-roadmap card" role="region" aria-label="Lộ trình sự nghiệp và mốc phát triển">
-        <div class="career-roadmap__head">
-          <span class="roadmap-badge">
-            <BaseIcon name="briefcase" /> Lộ trình sự nghiệp
-          </span>
-          <span class="roadmap-sub">VCcorp (2019 — Nay) &amp; Đại học Mở Hà Nội (2016 — 2019)</span>
-        </div>
-
-        <div class="career-timeline-track">
-          <!-- Item 1: VCcorp Current -->
-          <div class="timeline-stop timeline-stop--active">
-            <div class="stop-dot is-pulsing" />
-            <div class="stop-content">
-              <div class="stop-period">08/2025 — Hiện tại</div>
-              <strong class="stop-title">VCcorp · Senior Frontend / UI-UX Engineer</strong>
-              <div id="agent-milestone" class="stop-milestone">
-                <BaseIcon name="sparkle" class="sparkle-icon" />
-                <span>Trở lại công việc &amp; Bắt đầu sử dụng AI Agent tự động hóa workflow</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 2: VCcorp Pre-agents -->
-          <div class="timeline-stop">
-            <div class="stop-dot" />
-            <div class="stop-content">
-              <div class="stop-period">2019 — Trước 08/2025</div>
-              <strong class="stop-title">VCcorp · Frontend Developer &amp; AdTech Specialist</strong>
-              <p class="stop-desc">Xây dựng &amp; vận hành AdServing, A/B Testing, Interactive GIS Maps &amp; Emagazine.</p>
-            </div>
-          </div>
-
-          <!-- Item 3: Research & Transfer -->
-          <div class="timeline-stop">
-            <div class="stop-dot" />
-            <div class="stop-content">
-              <div class="stop-period">2016 — 2019</div>
-              <strong class="stop-title">Viện Đại học Mở Hà Nội · R&amp;D Tuyển sinh &amp; Đào tạo</strong>
-              <p class="stop-desc">Nghiên cứu &amp; phát triển phần mềm quản lý đào tạo phi chính quy.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- INTERACTIVE TAG FILTER BAR -->
-      <div class="filter-wrapper">
+      <div class="filter-wrapper sticky top-16 z-30 mb-8 py-2">
         <div class="filter-bar" role="tablist" aria-label="Bộ lọc công nghệ dự án">
           <button
             v-for="tab in filterTabs"
@@ -260,7 +204,7 @@ onBeforeUnmount(() => {
           >
             <BaseIcon :name="tab.icon" class="filter-icon" />
             <span class="filter-label">{{ tab.label }}</span>
-            <span class="filter-count">({{ tabCounts[tab.id] }})</span>
+            <span class="filter-count font-mono">({{ tabCounts[tab.id] }})</span>
           </button>
         </div>
       </div>
@@ -272,9 +216,9 @@ onBeforeUnmount(() => {
       <div class="case-studies-section" role="region" aria-label="Danh sách Dự án Tiêu biểu">
         <div class="section-subhead">
           <div class="section-subhead__info">
-            <h3 class="section-subhead__title">
+            <h3 class="section-subhead__title font-display">
               Dự án Tiêu Biểu (Featured Projects)
-              <span class="count-tag">{{ tier1FeaturedProjects.length }} dự án</span>
+              <span class="count-tag font-mono">{{ tier1FeaturedProjects.length }} dự án</span>
             </h3>
             <p class="section-subhead__desc">
               Phân tích sâu bài toán kỹ thuật, kiến trúc giải pháp và số liệu kiểm chứng thực tế.
@@ -283,11 +227,12 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Stagger / Animated Case Studies Grid -->
-        <TransitionGroup name="stagger-list" tag="div" class="case-studies-grid">
+        <TransitionGroup name="stagger-list" tag="div" class="case-studies-grid grid gap-7 sm:gap-8">
           <ProjectCard
-            v-for="project in tier1FeaturedProjects"
+            v-for="(project, index) in tier1FeaturedProjects"
             :key="project.id"
             :project="project"
+            :index="index"
           />
         </TransitionGroup>
 
@@ -300,7 +245,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <!-- 2. TIER 2: OTHER PROJECTS / ARCHIVE (BENTO COMPACT GRID 2-3 COLUMNS) -->
+      <!-- 2. TIER 2: OTHER PROJECTS / ARCHIVE (BENTO COMPACT GRID) -->
       <div
         v-if="tier2OtherProjects.length > 0"
         class="archive-section"
@@ -309,10 +254,10 @@ onBeforeUnmount(() => {
       >
         <div id="archive-section-head" class="archive-header">
           <div class="archive-header__info">
-            <h4 class="archive-header__title">
+            <h4 class="archive-header__title font-display">
               <BaseIcon name="layers" class="archive-icon" />
               Dự án Khác &amp; Hệ thống Bổ trợ (Archive &amp; Ecosystem)
-              <span class="count-tag">{{ tier2OtherProjects.length }} dự án</span>
+              <span class="count-tag font-mono">{{ tier2OtherProjects.length }} dự án</span>
             </h4>
             <p class="archive-header__desc">
               Các sản phẩm bổ trợ, công cụ nội bộ và module tính năng trong hệ sinh thái.
@@ -321,7 +266,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- Compact Bento Grid with Stagger Animation -->
-        <TransitionGroup name="stagger-compact" tag="div" class="archive-grid">
+        <TransitionGroup name="stagger-compact" tag="div" class="archive-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-stretch">
           <ProjectCard
             v-for="project in visibleArchiveProjects"
             :key="project.id"
@@ -349,8 +294,8 @@ onBeforeUnmount(() => {
             </span>
             <span class="btn-load-more__icon-box">
               <svg
-                class="arrow-icon"
-                :class="{ 'is-rotated': isArchiveExpanded }"
+                class="arrow-chevron"
+                :class="{ 'rotate-180': isArchiveExpanded }"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -372,157 +317,19 @@ onBeforeUnmount(() => {
 <style scoped>
 .experience-section {
   position: relative;
-  padding: clamp(3rem, 6vw, 6rem) 0;
+  padding-top: clamp(3rem, 6vw, 5rem);
+  padding-bottom: clamp(3rem, 6vw, 5rem);
 }
 
-.experience-anchor {
+.experience-anchor,
+.projects-scroll-anchor {
   display: block;
   height: 0;
-  scroll-margin-top: calc(var(--nav-h) + 20px);
+  scroll-margin-top: 6rem;
 }
 
-/* =====================================================================
-   CAREER ROADMAP BANNER
-   ===================================================================== */
-.career-roadmap {
-  background: var(--surface-solid);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: clamp(1.25rem, 2vw, 1.75rem);
-  margin-bottom: 2.5rem;
-  box-shadow: var(--shadow-sm);
-}
-
-[data-theme="light"] .career-roadmap {
-  background: #ffffff;
-  border-color: #e2e8f0;
-}
-
-.career-roadmap__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.25rem;
-}
-
-.roadmap-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--interactive-accent);
-}
-
-.roadmap-sub {
-  font-size: 0.78rem;
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-}
-
-.career-timeline-track {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-
-@media (max-width: 840px) {
-  .career-timeline-track {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-}
-
-.timeline-stop {
-  position: relative;
-  display: flex;
-  gap: 0.85rem;
-}
-
-.stop-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #94a3b8;
-  margin-top: 0.3rem;
-  flex-shrink: 0;
-}
-
-.timeline-stop--active .stop-dot {
-  background: var(--interactive-accent);
-  box-shadow: 0 0 0 4px var(--interactive-soft);
-}
-
-.is-pulsing {
-  animation: pulse-dot 2s infinite;
-}
-
-@keyframes pulse-dot {
-  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
-}
-
-.stop-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.stop-period {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-faint);
-  font-weight: 600;
-}
-
-.stop-title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.4;
-}
-
-.stop-desc {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.stop-milestone {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.35rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 8px;
-  background: var(--interactive-soft);
-  color: var(--interactive-accent);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.sparkle-icon {
-  width: 0.85rem;
-  height: 0.85rem;
-  flex-shrink: 0;
-}
-
-/* =====================================================================
-   INTERACTIVE TAG FILTER BAR
-   ===================================================================== */
+/* Filter bar */
 .filter-wrapper {
-  position: sticky;
-  top: calc(var(--nav-h) + 10px);
-  z-index: 45;
-  margin-bottom: 2.5rem;
-  padding: 0.35rem 0;
   pointer-events: none;
 }
 
@@ -531,131 +338,104 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 0.55rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  padding: 0.35rem 0.45rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface-solid) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   width: fit-content;
   max-width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  transition: box-shadow 200ms ease, background-color 200ms ease, border-color 200ms ease;
 }
 
 .filter-bar::-webkit-scrollbar {
   display: none;
 }
 
-[data-theme="dark"] .filter-bar {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(51, 65, 85, 0.7);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
-}
-
 .filter-tab-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 1rem;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.75rem;
   font-size: 0.82rem;
   font-weight: 600;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  background: transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
   cursor: pointer;
-  transition: all 180ms ease;
   user-select: none;
+  transition: all 180ms ease;
 }
 
 .filter-tab-btn:hover {
-  background: var(--bg-soft);
   color: var(--text);
+  background: var(--bg-soft);
 }
 
 .filter-tab-btn.is-active {
   background: var(--interactive-soft);
   color: var(--interactive-accent);
   border-color: var(--interactive-border);
-  font-weight: 700;
-  box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-icon {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 .filter-count {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   opacity: 0.75;
-  font-family: var(--font-mono);
 }
 
-/* =====================================================================
-   SECTION SUBHEAD
-   ===================================================================== */
+/* Subhead */
+.case-studies-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .section-subhead {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .section-subhead__title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  font-weight: 700;
   color: var(--text);
 }
 
 .count-tag {
-  padding: 0.2rem 0.6rem;
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
   border-radius: 9999px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
-  font-family: var(--font-mono);
 }
 
 .section-subhead__desc {
   font-size: 0.82rem;
-  color: var(--text-faint);
+  color: var(--text-muted);
   margin-top: 0.25rem;
 }
 
-/* =====================================================================
-   CASE STUDIES GRID & STAGGER ANIMATIONS
-   ===================================================================== */
-.case-studies-grid {
-  display: grid;
-  gap: 2.5rem;
-}
-
-.stagger-list-move,
-.stagger-list-enter-active,
-.stagger-list-leave-active {
-  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.stagger-list-enter-from {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-.stagger-list-leave-to {
-  opacity: 0;
-  transform: translateY(-16px);
-}
-
+/* Empty filter state */
 .empty-filter-box {
   padding: 3rem 1.5rem;
   text-align: center;
@@ -663,7 +443,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  border-radius: 16px;
+  border-radius: 1rem;
   background: var(--surface-solid);
   border: 1px dashed var(--border);
   color: var(--text-muted);
@@ -675,158 +455,109 @@ onBeforeUnmount(() => {
   color: var(--text-faint);
 }
 
-.projects-scroll-anchor {
-  display: block;
-  height: 0;
-  scroll-margin-top: calc(var(--nav-h) + 70px);
-}
-
-/* =====================================================================
-   TIER 2: ARCHIVE & SUPPORTING PROJECTS (COMPACT BENTO 2-3 COLS)
-   ===================================================================== */
+/* Archive */
 .archive-section {
-  margin-top: 4.5rem;
-  padding-top: 3.5rem;
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
   border-top: 1px solid var(--border);
 }
 
 .archive-header {
-  margin-bottom: 1.75rem;
-  scroll-margin-top: calc(var(--nav-h) + 80px);
+  margin-bottom: 1.5rem;
+  scroll-margin-top: 8rem;
 }
 
 .archive-header__title {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  font-size: 1.2rem;
+  gap: 0.6rem;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
   font-weight: 700;
   color: var(--text);
 }
 
 .archive-icon {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.25rem;
+  height: 1.25rem;
   color: var(--interactive-accent);
 }
 
 .archive-header__desc {
   font-size: 0.82rem;
-  color: var(--text-faint);
+  color: var(--text-muted);
   margin-top: 0.25rem;
 }
 
-.archive-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.35rem;
-}
-
-@media (max-width: 1024px) {
-  .archive-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .archive-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Compact Stagger Transitions */
-.stagger-compact-move,
-.stagger-compact-enter-active,
-.stagger-compact-leave-active {
-  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.stagger-compact-enter-from {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-.stagger-compact-leave-to {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-/* Load More / Expand Button */
 .archive-actions {
   display: flex;
   justify-content: center;
-  margin-top: 2.75rem;
+  margin-top: 2rem;
 }
 
 .btn-load-more {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.8rem 1.85rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   background: var(--surface-solid);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.88rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
-}
-
-[data-theme="light"] .btn-load-more {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  color: #1e293b;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  box-shadow: var(--shadow-sm);
+  transition: all 200ms ease;
 }
 
 .btn-load-more:hover {
-  background: var(--bg-soft);
   border-color: var(--interactive-accent);
+  background: var(--interactive-soft);
   color: var(--interactive-accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
-}
-
-.btn-load-more:active {
-  transform: translateY(0);
-}
-
-.btn-load-more__text {
-  letter-spacing: -0.01em;
+  transform: translateY(-1px);
 }
 
 .btn-load-more__icon-box {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--interactive-soft);
-  color: var(--interactive-accent);
 }
 
-.arrow-icon {
-  width: 14px;
-  height: 14px;
-  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  animation: arrow-bounce 1.5s infinite ease-in-out;
+.arrow-chevron {
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: transform 300ms ease;
 }
 
-.arrow-icon.is-rotated {
-  animation: none;
+.arrow-chevron.rotate-180 {
   transform: rotate(180deg);
 }
 
-@keyframes arrow-bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(3px);
-  }
+/* Vue TransitionGroup animations */
+.stagger-list-move,
+.stagger-list-enter-active,
+.stagger-list-leave-active,
+.stagger-compact-move,
+.stagger-compact-enter-active,
+.stagger-compact-leave-active {
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger-list-enter-from,
+.stagger-compact-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.stagger-list-leave-to,
+.stagger-compact-leave-to {
+  opacity: 0;
+  transform: translateY(-16px);
 }
 </style>

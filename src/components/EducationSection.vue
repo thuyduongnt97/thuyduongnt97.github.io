@@ -8,7 +8,7 @@ import { community, education } from '../data/profile'
   <section id="education" aria-labelledby="edu-title">
     <div class="container">
       <SectionHead
-        eyebrow="03 — Nền tảng"
+        eyebrow="04 — Nền tảng"
         title="Học vấn &amp; cộng đồng"
         title-id="edu-title"
       />

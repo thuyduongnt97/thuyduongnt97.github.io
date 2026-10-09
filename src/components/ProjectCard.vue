@@ -4,16 +4,20 @@ import BaseIcon from './BaseIcon.vue'
 import ProductLinks from './ProductLinks.vue'
 import ProjectMockupPreview from './ProjectMockupPreview.vue'
 import { getAchievementSegments, getProjectDeliveryLabel, getProjectLinks } from '../utils/portfolio'
+import { useProjectLightbox } from '../composables/useProjectLightbox'
 
 const props = defineProps({
   project: { type: Object, required: true },
   compact: { type: Boolean, default: false },
+  index: { type: Number, default: 0 },
 })
 
+const { openLightbox } = useProjectLightbox()
+
+const isReversed = computed(() => !props.compact && props.index % 2 === 1)
 const deliveryLabel = computed(() => getProjectDeliveryLabel(props.project))
 const links = computed(() => getProjectLinks(props.project))
 const achievements = computed(() => (props.project.achievements ?? []).map(getAchievementSegments))
-const hasCaseStudy = computed(() => Boolean(props.project.caseStudy))
 </script>
 
 <template>
@@ -28,138 +32,146 @@ const hasCaseStudy = computed(() => Boolean(props.project.caseStudy))
   >
     <div class="card-spotlight" aria-hidden="true" />
 
-    <div class="case-study-grid">
-      <!-- 1. VISUAL PREVIEW COLUMN -->
-      <div class="case-study__visual">
-        <ProjectMockupPreview :project="project" />
-      </div>
-
-      <!-- 2. CONTENT & TECHNICAL DEEP-DIVE COLUMN -->
-      <div class="case-study__content">
-        <!-- Top Meta Row -->
-        <header class="case-study__meta-bar">
-          <div class="case-study__badges">
-            <span class="featured-project-badge">
-              ⭐ Featured Project
-            </span>
-            <span v-if="project.domain" class="domain-badge">
-              <BaseIcon name="layers" class="badge-icon" />
-              {{ project.domain }}
-            </span>
-          </div>
-
-          <div class="case-study__time-role">
-            <span v-if="project.period" class="time-pill">
-              <BaseIcon name="calendar" class="badge-icon" />
-              {{ project.period }}
-            </span>
-            <span v-else-if="project.delivery === 'before-ai'" class="time-pill">
-              {{ deliveryLabel }}
-            </span>
-          </div>
-        </header>
-
-        <!-- Project Title & Subtitle -->
-        <div class="case-study__heading">
-          <h4 :id="`project-title-${project.id}`" class="case-study__title">
-            {{ project.name }}
-          </h4>
-          <p v-if="project.role" class="case-study__role">
-            {{ project.role }}
-          </p>
+    <div class="case-study-grid grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-stretch">
+      <!-- CỘT 1: VISUAL MOCKUP & KEY IMPACT (METRICS) -->
+      <div
+        class="case-study__visual flex flex-col gap-4 justify-between h-full"
+        :class="isReversed ? 'lg:order-2' : 'lg:order-1'"
+      >
+        <!-- 1. Hộp Browser Mockup -->
+        <div class="case-study__mockup-frame">
+          <ProjectMockupPreview :project="project" />
         </div>
 
-        <p v-if="project.description" class="case-study__desc">
-          {{ project.description }}
-        </p>
-
-        <!-- CASE STUDY: CHALLENGE & SOLUTION + DEDICATED KPI CALLOUT -->
-        <div v-if="project.caseStudy" class="case-study__body-wrap">
-          <!-- 1. Context: Challenge & Solution -->
-          <div class="case-study__flow">
-            <div class="flow-item flow-item--challenge">
-              <div class="flow-item__head">
-                <span class="flow-icon flow-icon--amber">⚡</span>
-                <strong>Thách thức kỹ thuật (Challenge):</strong>
-              </div>
-              <p class="flow-item__body">
-                {{ project.caseStudy.challenge }}
-              </p>
-            </div>
-
-            <div class="flow-item flow-item--solution">
-              <div class="flow-item__head">
-                <span class="flow-icon flow-icon--indigo">⚙</span>
-                <strong>Giải pháp Frontend (Solution):</strong>
-              </div>
-              <p class="flow-item__body">
-                {{ project.caseStudy.solution }}
-              </p>
-            </div>
-          </div>
-
-          <!-- 2. Dedicated KPI Callout: Outcome & Key Impact -->
-          <div class="kpi-callout">
-            <div class="kpi-callout__head">
-              <div class="kpi-callout__badge">
-                <span class="pulse-indicator" />
-                <svg class="kpi-head-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <strong>Kết quả &amp; Thước đo (Key Impact)</strong>
-              </div>
-            </div>
-
-            <p v-if="project.caseStudy.impact" class="kpi-callout__summary">
-              {{ project.caseStudy.impact }}
-            </p>
-
-            <!-- Metrics Grid 2 Columns -->
-            <div v-if="project.caseStudy.metrics?.length" class="kpi-grid">
-              <div
-                v-for="metric in project.caseStudy.metrics"
-                :key="metric.label"
-                class="kpi-pill"
-              >
-                <div class="kpi-pill__icon-box">
-                  <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                <div class="kpi-pill__info">
-                  <span class="kpi-pill__val">{{ metric.value }}</span>
-                  <span class="kpi-pill__lbl">{{ metric.label }}</span>
-                </div>
-              </div>
-            </div>
+        <!-- 2. Thanh Stats Mini (Horizontal mini-bar: 2-3 con số ấn tượng) -->
+        <div v-if="project.caseStudy?.metrics?.length" class="case-study__stats-bar grid grid-cols-3 gap-2">
+          <div
+            v-for="metric in project.caseStudy.metrics.slice(0, 3)"
+            :key="metric.label"
+            class="case-study__stat-item"
+          >
+            <span class="stat-value font-display">{{ metric.value }}</span>
+            <span class="stat-label">{{ metric.label }}</span>
           </div>
         </div>
 
         <!-- Fallback Achievements List if no structured case study -->
         <div v-else-if="achievements.length" class="case-study__achievements">
-          <ul class="achievement-list" role="list">
-            <li v-for="(achievement, index) in achievements" :key="index">
-              <span class="check-icon">✓</span>
+          <ul class="achievements-list" role="list">
+            <li v-for="(achievement, achIdx) in achievements" :key="achIdx" class="achievement-item">
+              <span class="achievement-check" aria-hidden="true">✓</span>
               <span>
                 <template v-for="(segment, segIdx) in achievement" :key="segIdx">
-                  <strong v-if="segment.isMetric">{{ segment.text }}</strong>
+                  <strong v-if="segment.isMetric" class="achievement-metric">{{ segment.text }}</strong>
                   <template v-else>{{ segment.text }}</template>
                 </template>
               </span>
             </li>
           </ul>
         </div>
+      </div>
 
-        <!-- Tech Stack Pills & Action Links -->
+      <!-- CỘT 2: HEADER, TITLE, THÁCH THỨC & GIẢI PHÁP, TECH STACK -->
+      <div
+        class="case-study__content flex flex-col justify-between gap-5 h-full"
+        :class="isReversed ? 'lg:order-1' : 'lg:order-2'"
+      >
+        <!-- 1. Header & Title Group -->
+        <div class="case-study__header-group">
+          <!-- Top Meta Row -->
+          <header class="case-study__meta-bar">
+            <div class="case-study__badges">
+              <span class="badge-featured">
+                ⭐ Featured Project
+              </span>
+              <span v-if="project.domain" class="badge-domain">
+                <BaseIcon name="layers" class="badge-icon" />
+                {{ project.domain }}
+              </span>
+              <span v-if="links.length" class="badge-status badge-status--live">
+                <span class="status-dot animate-ping" /> Live Demo
+              </span>
+              <span v-else-if="project.videoUrl" class="badge-status badge-status--video">
+                <span class="status-dot animate-ping" /> Video Demo
+              </span>
+              <span v-else class="badge-status badge-status--ui">
+                <BaseIcon name="sparkle" class="badge-icon" /> Interactive UI
+              </span>
+            </div>
+
+            <div class="case-study__period">
+              <span v-if="project.period" class="period-text">
+                <BaseIcon name="calendar" class="period-icon" />
+                {{ project.period }}
+              </span>
+              <span v-else-if="project.delivery === 'before-ai'">
+                {{ deliveryLabel }}
+              </span>
+            </div>
+          </header>
+
+          <!-- Project Title & Subtitle -->
+          <div class="case-study__title-wrap">
+            <h4 :id="`project-title-${project.id}`" class="case-study__title font-display">
+              {{ project.name }}
+            </h4>
+            <p v-if="project.role" class="case-study__role">
+              {{ project.role }}
+            </p>
+          </div>
+
+          <p v-if="project.description" class="case-study__desc">
+            {{ project.description }}
+          </p>
+        </div>
+
+        <!-- 2. Thách thức kỹ thuật & Giải pháp Frontend (border-l) -->
+        <div v-if="project.caseStudy" class="case-study__points">
+          <div v-if="project.caseStudy.challenge" class="case-study__point case-study__point--challenge">
+            <div class="point-head point-head--challenge">
+              <span class="point-dot" aria-hidden="true" />
+              <span>Thách thức kỹ thuật</span>
+            </div>
+            <p class="point-text">
+              {{ project.caseStudy.challenge }}
+            </p>
+          </div>
+
+          <div v-if="project.caseStudy.solution" class="case-study__point case-study__point--solution">
+            <div class="point-head point-head--solution">
+              <span class="point-dot" aria-hidden="true" />
+              <span>Giải pháp Frontend</span>
+            </div>
+            <p class="point-text">
+              {{ project.caseStudy.solution }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Dải tags công nghệ & Action Links (Xếp gọn gàng dưới cùng) -->
         <footer class="case-study__footer">
-          <ul v-if="project.techStack?.length" class="tech-pills" role="list" aria-label="Công nghệ sử dụng">
-            <li v-for="tech in project.techStack" :key="tech" class="tech-pill-item">
+          <ul v-if="project.techStack?.length" class="case-study__tech-list" role="list" aria-label="Công nghệ sử dụng">
+            <li
+              v-for="tech in project.techStack"
+              :key="tech"
+              class="case-study__tech-tag"
+            >
               {{ tech }}
             </li>
           </ul>
 
-          <div v-if="links.length" class="case-study__actions">
-            <ProductLinks :links="links" compact />
+          <div class="case-study__actions">
+            <ProductLinks v-if="links.length" :links="links" compact />
+            <button
+              type="button"
+              class="btn-case-study"
+              @click="openLightbox(project)"
+              :aria-label="`Xem chi tiết Case Study & UI Mockup ${project.name}`"
+            >
+              <BaseIcon name="layers" class="btn-icon" />
+              <span>{{ links.length ? 'Case Study & UI' : 'Khám phá Case Study' }}</span>
+              <BaseIcon name="arrow" class="btn-arrow" />
+            </button>
           </div>
         </footer>
       </div>
@@ -178,101 +190,154 @@ const hasCaseStudy = computed(() => Boolean(props.project.caseStudy))
     <div class="card-spotlight" aria-hidden="true" />
 
     <!-- Mockup thumbnail nhỏ -->
-    <div class="compact-card__thumb">
+    <div class="compact-project__mockup">
       <ProjectMockupPreview :project="project" mini />
     </div>
 
-    <div class="compact-card__body">
-      <header class="compact-card__header">
-        <div class="compact-card__meta">
-          <span v-if="project.domain" class="compact-domain">{{ project.domain }}</span>
-          <span v-else-if="project.status" class="compact-status">{{ project.status }}</span>
-          <span v-if="project.period" class="compact-period">{{ project.period }}</span>
+    <div class="compact-project__body">
+      <header>
+        <div class="compact-project__meta">
+          <span v-if="project.domain" class="compact-tag">{{ project.domain }}</span>
+          <span v-else-if="project.status" class="compact-tag">{{ project.status }}</span>
+          <span v-if="project.period">{{ project.period }}</span>
         </div>
-        <h4 :id="`project-title-${project.id}`" class="compact-card__title">
+        <h4 :id="`project-title-${project.id}`" class="compact-project__title font-display">
           {{ project.name }}
         </h4>
-        <p v-if="project.role" class="compact-card__role">{{ project.role }}</p>
+        <p v-if="project.role" class="compact-project__role">{{ project.role }}</p>
       </header>
 
-      <p v-if="project.description" class="compact-card__desc">
+      <p v-if="project.description" class="compact-project__desc">
         {{ project.description }}
       </p>
 
-      <footer class="compact-card__footer">
-        <ul v-if="project.techStack?.length" class="tech-pills tech-pills--mini" role="list" aria-label="3 công nghệ chính">
-          <li v-for="tech in project.techStack.slice(0, 3)" :key="tech" class="tech-pill-item">
+      <footer class="compact-project__footer">
+        <ul v-if="project.techStack?.length" class="compact-project__tags" role="list" aria-label="3 công nghệ chính">
+          <li
+            v-for="tech in project.techStack.slice(0, 3)"
+            :key="tech"
+            class="compact-project__tag"
+          >
             {{ tech }}
           </li>
         </ul>
-        <ProductLinks v-if="links.length" :links="links" compact class="compact-card__links" />
-        <span v-else class="compact-card__doc-badge">
-          <BaseIcon name="layers" class="mini-icon" /> Chi tiết kỹ thuật
-        </span>
+        <div class="compact-project__actions">
+          <ProductLinks v-if="links.length" :links="links" compact />
+          <button
+            type="button"
+            class="compact-project__btn"
+            @click="openLightbox(project)"
+            :aria-label="`Xem UI mockup chi tiết cho ${project.name}`"
+          >
+            <BaseIcon :name="links.length ? 'sparkle' : 'layers'" class="btn-icon" />
+            <span>{{ links.length ? 'Chi tiết UI' : 'Xem Demo UI' }}</span>
+            <BaseIcon name="arrow" class="btn-arrow" />
+          </button>
+        </div>
       </footer>
     </div>
   </article>
 </template>
 
 <style scoped>
-/* =====================================================================
-   CASE STUDY FEATURED CARD STYLES
-   ===================================================================== */
+/* Case study card container */
 .case-study-card {
-  --case-accent: var(--accent);
-  --case-accent-soft: var(--interactive-soft);
   position: relative;
+  border-radius: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
   background: var(--surface-solid);
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: clamp(1.25rem, 2.5vw, 2rem);
   box-shadow: var(--shadow-sm);
-  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 300ms ease,
-              box-shadow 300ms ease;
-  scroll-margin-top: calc(var(--nav-h) + 80px);
-  overflow: hidden;
-}
-
-[data-theme="light"] .case-study-card {
-  background: #ffffff;
-  border-color: #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.05);
+  transition: transform 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
 }
 
 .case-study-card:hover {
-  transform: translateY(-4px);
   border-color: var(--interactive-border);
-  box-shadow: var(--interactive-elevation);
+  box-shadow: var(--shadow-lg);
 }
 
-.case-study-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  align-items: start;
-}
-
-@media (max-width: 960px) {
-  .case-study-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.case-study__visual {
-  position: sticky;
-  top: calc(var(--nav-h) + 80px);
+/* Mockup frame */
+.case-study__mockup-frame {
   width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: var(--shadow-sm);
 }
 
-.case-study__content {
+/* Stats mini bar */
+.case-study__stats-bar {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bg-soft) 60%, transparent);
+  border: 1px solid var(--border);
+}
+
+.case-study__stat-item {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
-  min-width: 0;
+  align-items: center;
+  text-align: center;
+  padding: 0.25rem;
 }
 
-/* Meta Bar */
+.stat-value {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 700;
+  color: var(--interactive-accent);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+/* Fallback achievements */
+.case-study__achievements {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--bg-soft) 50%, transparent);
+  border: 1px solid var(--border);
+}
+
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.achievement-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.achievement-check {
+  color: #10b981;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.achievement-metric {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Header & Meta */
+.case-study__header-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .case-study__meta-bar {
   display: flex;
   flex-wrap: wrap;
@@ -285,545 +350,394 @@ const hasCaseStudy = computed(() => Boolean(props.project.caseStudy))
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
-}
-
-.domain-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.65rem;
-  border-radius: 9999px;
-  background: var(--interactive-soft);
-  color: var(--interactive-accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.domain-badge .badge-icon {
-  width: 0.8rem;
-  height: 0.8rem;
-}
-
-.featured-project-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.22rem 0.65rem;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #f59e0b;
-  color: #92400e;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 1px 3px 0 rgb(245 158 11 / 0.15);
-}
-
-[data-theme="dark"] .featured-project-badge {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #fcd34d;
-}
-
-.case-study__time-role {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
-.time-pill {
+.badge-featured {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
-  background: var(--bg-soft);
-  color: var(--text-faint);
-  font-family: var(--font-mono);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
   font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-.time-pill .badge-icon {
+.badge-domain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--bg-soft);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-status--live {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-status--video {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.badge-status--ui {
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+.badge-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.case-study__period {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.period-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.period-icon {
   width: 0.75rem;
   height: 0.75rem;
 }
 
-/* Heading */
-.case-study__heading {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
+/* Title & Description */
 .case-study__title {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-weight: 700;
   color: var(--text);
-  line-height: 1.3;
-  letter-spacing: -0.015em;
-  transition: color 200ms ease;
-}
-
-.case-study-card:hover .case-study__title {
-  color: var(--case-accent);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 .case-study__role {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--interactive-accent);
+  margin-top: 0.2rem;
 }
 
 .case-study__desc {
   font-size: 0.875rem;
-  line-height: 1.65;
   color: var(--text-muted);
+  line-height: 1.65;
 }
 
-/* CASE STUDY FLOW: CHALLENGE & SOLUTION */
-.case-study__body-wrap {
+/* Points (Challenge & Solution) */
+.case-study__points {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.4rem;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
 }
 
-.case-study__flow {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+.case-study__point {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border-left-width: 3px;
 }
 
-.flow-item {
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.flow-item--challenge {
-  border-left: 3.5px solid #f59e0b;
-}
-
-[data-theme="light"] .flow-item--challenge {
-  background: rgba(254, 243, 199, 0.3);
-  border-color: rgba(245, 158, 11, 0.22);
-  border-left-color: #d97706;
-}
-
-[data-theme="dark"] .flow-item--challenge {
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.25);
+.case-study__point--challenge {
+  background: rgba(245, 158, 11, 0.05);
   border-left-color: #f59e0b;
 }
 
-.flow-item--solution {
-  border-left: 3.5px solid #6366f1;
+.case-study__point--solution {
+  background: var(--interactive-soft);
+  border-left-color: var(--interactive-accent);
 }
 
-[data-theme="light"] .flow-item--solution {
-  background: rgba(238, 242, 255, 0.4);
-  border-color: rgba(99, 102, 241, 0.22);
-  border-left-color: #4f46e5;
-}
-
-[data-theme="dark"] .flow-item--solution {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.25);
-  border-left-color: #6366f1;
-}
-
-.flow-item__head {
+.point-head {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--text);
+  margin-bottom: 0.25rem;
 }
 
-.flow-icon {
-  font-size: 0.85rem;
+.point-head--challenge {
+  color: #d97706;
 }
-.flow-icon--amber { color: #d97706; }
-.flow-icon--indigo { color: #4f46e5; }
 
-.flow-item__body {
+[data-theme="dark"] .point-head--challenge {
+  color: #fbbf24;
+}
+
+.point-head--solution {
+  color: var(--interactive-accent);
+}
+
+.point-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+}
+
+.point-text {
   font-size: 0.82rem;
-  line-height: 1.55;
   color: var(--text-muted);
-  margin: 0;
-}
-
-/* =====================================================================
-   DEDICATED KPI CALLOUT: KEY IMPACT & METRICS
-   ===================================================================== */
-.kpi-callout {
-  padding: 1.1rem 1.25rem;
-  border-radius: 14px;
-  background: rgba(236, 253, 245, 0.65);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-[data-theme="dark"] .kpi-callout {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.25);
-  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.3);
-}
-
-.kpi-callout__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.kpi-callout__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #047857;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="dark"] .kpi-callout__badge {
-  color: #34d399;
-}
-
-.kpi-head-icon {
-  width: 14px;
-  height: 14px;
-  color: #059669;
-}
-
-[data-theme="dark"] .kpi-head-icon {
-  color: #34d399;
-}
-
-.kpi-callout__summary {
-  font-size: 0.825rem;
   line-height: 1.6;
-  color: var(--text);
-  margin: 0;
-  font-weight: 500;
 }
 
-[data-theme="light"] .kpi-callout__summary {
-  color: #1e293b;
-}
-
-/* KPI Badges 2-Column Grid */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
-  margin-top: 0.25rem;
-}
-
-@media (max-width: 520px) {
-  .kpi-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.kpi-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 10px;
-  background: #ffffff;
-  border: 1px solid rgba(16, 185, 129, 0.22);
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
-  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-
-[data-theme="dark"] .kpi-pill {
-  background: rgba(15, 23, 42, 0.7);
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-.kpi-pill:hover {
-  transform: translateY(-1.5px);
-  border-color: #10b981;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.12);
-}
-
-.kpi-pill__icon-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
-  flex-shrink: 0;
-}
-
-[data-theme="dark"] .kpi-pill__icon-box {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-}
-
-.kpi-icon {
-  width: 12px;
-  height: 12px;
-}
-
-.kpi-pill__info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.kpi-pill__val {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #047857;
-  line-height: 1.25;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
-[data-theme="dark"] .kpi-pill__val {
-  color: #34d399;
-}
-
-.kpi-pill__lbl {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #64748b;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-[data-theme="dark"] .kpi-pill__lbl {
-  color: #94a3b8;
-}
-
-/* Achievements List fallback */
-.achievement-list {
-  display: grid;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  line-height: 1.6;
-  color: var(--text-muted);
-}
-
-.achievement-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.check-icon {
-  flex-shrink: 0;
-  color: var(--case-accent);
-  font-weight: 800;
-}
-
-.achievement-list strong {
-  color: var(--text);
-  font-weight: 700;
-}
-
-/* Tech Stack & Footer */
+/* Footer & Tech Tags */
 .case-study__footer {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border);
 }
 
-.tech-pills {
+.case-study__tech-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
 }
 
-.tech-pill-item {
-  padding: 0.2rem 0.6rem;
-  border-radius: 6px;
+.case-study__tech-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   background: var(--bg-soft);
   color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
   border: 1px solid var(--border);
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
-.tech-pill-item:hover {
-  background: var(--interactive-soft);
-  color: var(--interactive-accent);
+.case-study__tech-tag:hover {
   border-color: var(--interactive-border);
+  color: var(--text);
 }
 
 .case-study__actions {
-  margin-left: auto;
-}
-
-/* =====================================================================
-   COMPACT SUPPORTING PROJECT CARD STYLES
-   ===================================================================== */
-.compact-project-card {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  border-radius: 16px;
-  background: var(--surface-solid);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
-  scroll-margin-top: calc(var(--nav-h) + 80px);
-  overflow: hidden;
-}
-
-[data-theme="light"] .compact-project-card {
-  background: #ffffff;
-  border-color: #e2e8f0;
-}
-
-.compact-project-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--interactive-border);
-  box-shadow: var(--interactive-elevation);
-}
-
-.compact-card__thumb {
-  width: 100%;
-  background: var(--bg-soft);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-
-.compact-card__body {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  padding: 1.15rem;
-}
-
-.compact-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.compact-card__meta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.68rem;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.compact-domain {
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
+.btn-case-study {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0.75rem;
   background: var(--interactive-soft);
   color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
+  font-size: 0.82rem;
   font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  margin-left: auto;
+  transition: all 180ms ease;
 }
 
-.compact-status {
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  background: var(--bg-soft);
-  color: var(--text-faint);
+.btn-case-study:hover {
+  background: var(--interactive-accent);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
-.compact-period {
+.btn-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.btn-arrow {
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: transform 180ms ease;
+}
+
+.btn-case-study:hover .btn-arrow {
+  transform: translateX(2px);
+}
+
+/* Compact project card */
+.compact-project-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 1rem;
+  padding: 1.15rem;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.compact-project-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--interactive-border);
+  box-shadow: var(--shadow-hover);
+}
+
+.compact-project__mockup {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-bottom: 0.75rem;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.compact-project__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.compact-project__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
   font-family: var(--font-mono);
+  font-size: 0.72rem;
   color: var(--text-faint);
 }
 
-.compact-card__title {
+.compact-tag {
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.35rem;
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+
+.compact-project__title {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.35;
-  transition: color 200ms ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.compact-project-card:hover .compact-card__title {
-  color: var(--accent);
-}
-
-.compact-card__role {
+.compact-project__role {
   font-size: 0.75rem;
-  color: var(--text-faint);
+  color: var(--interactive-accent);
   font-weight: 500;
+  margin-top: 0.15rem;
 }
 
-.compact-card__desc {
-  font-size: 0.78rem;
-  line-height: 1.6;
+.compact-project__desc {
+  font-size: 0.8rem;
   color: var(--text-muted);
-  margin: 0.75rem 0;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.compact-card__achievements {
-  margin-bottom: 0.85rem;
-  padding: 0.5rem 0.65rem;
-  border-radius: 8px;
-  background: var(--bg-soft);
-}
-
-.achievement-list--mini {
-  gap: 0.25rem;
-  font-size: 0.72rem;
-}
-
-.compact-card__footer {
+.compact-project__footer {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
 }
 
-.tech-pills--mini {
-  gap: 0.3rem;
+.compact-project__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
-.tech-pills--mini .tech-pill-item {
-  padding: 0.15rem 0.45rem;
-  font-size: 0.65rem;
+.compact-project__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--bg-soft);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
 }
 
-.compact-card__links {
-  margin-top: 0.25rem;
+.compact-project__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.compact-card__doc-badge {
+.compact-project__btn {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.72rem;
-  color: var(--text-faint);
-  font-family: var(--font-mono);
-  margin-top: 0.25rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.5rem;
+  background: var(--interactive-soft);
+  color: var(--interactive-accent);
+  border: 1px solid var(--interactive-border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: auto;
+  transition: all 150ms ease;
 }
 
-.compact-card__doc-badge .mini-icon {
-  width: 0.75rem;
-  height: 0.75rem;
+.compact-project__btn:hover {
+  background: var(--interactive-accent);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-study-card,
+  .compact-project-card,
+  .btn-case-study,
+  .compact-project__btn {
+    transition: none;
+  }
 }
 </style>

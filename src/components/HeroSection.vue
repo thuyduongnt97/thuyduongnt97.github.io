@@ -89,7 +89,7 @@ onMounted(() => {
       </div>
 
       <!-- CỘT PHẢI: INTERACTIVE UI COMPONENT PLAYGROUND -->
-      <aside v-reveal="80" class="hero-intro__playground" aria-label="Interactive UI Component Playground">
+      <aside v-reveal="80" class="hero-intro__playground hidden lg:block" aria-label="Interactive UI Component Playground">
         <HeroPlayground />
       </aside>
     </div>

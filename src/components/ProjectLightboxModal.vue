@@ -5,6 +5,7 @@ import ProductLinks from './ProductLinks.vue'
 import ProjectMockupPreview from './ProjectMockupPreview.vue'
 import { useProjectLightbox } from '../composables/useProjectLightbox'
 import { getAchievementSegments, getProjectLinks, resolveProjectUrl } from '../utils/portfolio'
+import { lockScroll, unlockScroll, forceUnlockScroll } from '../utils/scrollLock.js'
 
 const { activeProject, closeLightbox } = useProjectLightbox()
 
@@ -31,19 +32,22 @@ function handleKeyDown(event) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
+  if (!activeProject.value) {
+    forceUnlockScroll()
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown)
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = ''
-  }
+  forceUnlockScroll()
 })
 
 // Ensure scroll lock is safely synced if component re-renders or unmounts
 watch(activeProject, (newVal) => {
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = newVal ? 'hidden' : ''
+  if (newVal) {
+    lockScroll()
+  } else {
+    unlockScroll()
   }
 })
 </script>
@@ -57,6 +61,8 @@ watch(activeProject, (newVal) => {
       aria-modal="true"
       :aria-labelledby="`lightbox-title-${activeProject.id}`"
       @click="closeLightbox"
+      @wheel.self.prevent
+      @touchmove.self.prevent
     >
       <div class="lightbox-dialog" @click.stop>
         <!-- Modal Top Bar: Header + Sub-headline + Tech Stack Badges -->

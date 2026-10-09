@@ -7,7 +7,7 @@ import { profile } from '../data/profile'
   <section id="contact" class="contact" aria-labelledby="contact-title">
     <div class="container">
       <div v-reveal class="cta">
-        <span class="eyebrow">04 — Liên hệ</span>
+        <span class="eyebrow">06 — Liên hệ</span>
         <h2 id="contact-title">Cùng phát triển <span class="gradient-text">sản phẩm web</span></h2>
         <p>Kết nối với mình về frontend, landing page, trải nghiệm tương tác hoặc phát triển sản phẩm fullstack.</p>
         <div class="cta__row">

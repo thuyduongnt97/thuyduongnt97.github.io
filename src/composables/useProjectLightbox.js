@@ -1,19 +1,18 @@
 import { ref } from 'vue'
+import { lockScroll, unlockScroll } from '../utils/scrollLock.js'
 
 const activeProject = ref(null)
 
 export function useProjectLightbox() {
   const openLightbox = (project) => {
     activeProject.value = project
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = 'hidden'
-    }
+    lockScroll()
   }
 
   const closeLightbox = () => {
-    activeProject.value = null
-    if (typeof document !== 'undefined') {
-      document.body.style.overflow = ''
+    if (activeProject.value) {
+      activeProject.value = null
+      unlockScroll()
     }
   }
 
