@@ -41,8 +41,12 @@ function profileMetadata() {
         { tag: 'meta', attrs: { property: 'og:title', content: seo.socialTitle } },
         { tag: 'meta', attrs: { property: 'og:description', content: seo.socialDescription } },
         { tag: 'meta', attrs: { property: 'og:url', content: profile.websiteUrl } },
+        { tag: 'meta', attrs: { property: 'og:image', content: `${profile.websiteUrl.replace(/\/$/, '')}/og-image.png` } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         { tag: 'meta', attrs: { property: 'og:locale', content: seo.locale } },
-        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary' } },
+        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: `${profile.websiteUrl.replace(/\/$/, '')}/og-image.png` } },
         {
           tag: 'script',
           attrs: { type: 'application/ld+json' },

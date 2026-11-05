@@ -3,15 +3,33 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import BaseIcon from './BaseIcon.vue'
 import ProductLinks from './ProductLinks.vue'
 import ProjectMockupPreview from './ProjectMockupPreview.vue'
+import { experiences } from '../data/experiences'
 import { useProjectLightbox } from '../composables/useProjectLightbox'
+import { useLocale } from '../composables/useLocale'
 import { getAchievementSegments, getProjectLinks, resolveProjectUrl } from '../utils/portfolio'
 import { forceUnlockScroll } from '../utils/scrollLock.js'
 
-const { activeProject, closeLightbox } = useProjectLightbox()
+const { activeProject, openLightbox, closeLightbox } = useProjectLightbox()
+const { pick } = useLocale()
 const dialog = ref(null)
 const closeButton = ref(null)
 const selectedScreenshot = ref(null)
 let previousFocus = null
+
+const allProjectsById = new Map(
+  experiences.flatMap(exp => exp.projects).map(proj => [proj.id, proj])
+)
+const coreCaseOrder = ['qr', 'experiments', 'government-map']
+const currentCoreIndex = computed(() =>
+  activeProject.value ? coreCaseOrder.indexOf(activeProject.value.id) : -1
+)
+
+function navigateCoreCase(offset) {
+  if (currentCoreIndex.value === -1) return
+  const nextIndex = (currentCoreIndex.value + offset + coreCaseOrder.length) % coreCaseOrder.length
+  const nextProject = allProjectsById.get(coreCaseOrder[nextIndex])
+  if (nextProject) openLightbox(nextProject)
+}
 
 const projectLinks = computed(() => {
   if (!activeProject.value) return []
@@ -20,12 +38,19 @@ const projectLinks = computed(() => {
 
 const detailedDemos = computed(() => {
   if (!activeProject.value?.links) return []
-  return activeProject.value.links.filter((l) => l.desktopUrl || l.mobileUrl)
+  return activeProject.value.links.filter(l => l.desktopUrl || l.mobileUrl)
 })
 
 const achievements = computed(() => {
-  if (!activeProject.value?.achievements) return []
-  return activeProject.value.achievements.map(getAchievementSegments)
+  const list = pick(activeProject.value?.achievements, activeProject.value?.achievementsEn)
+  if (!list) return []
+  return list.map(getAchievementSegments)
+})
+
+const caseActions = computed(() => {
+  const cs = activeProject.value?.caseStudy
+  if (!cs) return []
+  return pick(cs.actions, cs.actionsEn) ?? []
 })
 
 function handleKeyDown(event) {
@@ -33,10 +58,20 @@ function handleKeyDown(event) {
   if (event.key === 'Escape') {
     event.preventDefault()
     closeLightbox()
+    return
+  }
+  if (currentCoreIndex.value !== -1 && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    const tag = document.activeElement?.tagName
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+      event.preventDefault()
+      navigateCoreCase(event.key === 'ArrowRight' ? 1 : -1)
+      return
+    }
   }
   if (event.key === 'Tab') {
-    const controls = [...(dialog.value?.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]') ?? [])]
-      .filter(element => element.getClientRects().length)
+    const controls = [
+      ...(dialog.value?.querySelectorAll('a[href], button:not([disabled]), [tabindex="0"]') ?? []),
+    ].filter(element => element.getClientRects().length)
     const first = controls[0]
     const last = controls.at(-1)
     if (event.shiftKey && document.activeElement === first) {
@@ -49,32 +84,53 @@ function handleKeyDown(event) {
   }
 }
 
+function checkHashDeepLink() {
+  if (typeof window === 'undefined') return
+  const hash = window.location.hash
+  if (hash.startsWith('#case-')) {
+    const id = hash.slice('#case-'.length)
+    const aliasMap = { ab: 'experiments', webgis: 'government-map', shortlink: 'qr' }
+    const targetId = aliasMap[id] || id
+    const found = allProjectsById.get(targetId)
+    if (found) openLightbox(found)
+  }
+}
+
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('hashchange', checkHashDeepLink)
   if (!activeProject.value) {
     forceUnlockScroll()
+    checkHashDeepLink()
   }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('hashchange', checkHashDeepLink)
   forceUnlockScroll()
 })
 
-// The composable owns scroll locking; the modal owns focus and screenshot selection.
-watch(activeProject, async (project, previousProject) => {
-  selectedScreenshot.value = project?.screenshots?.find(screenshot => screenshot.src === project.imageUrl)
-    ?? (project?.imageUrl ? { src: project.imageUrl, alt: `Ảnh chụp màn hình ${project.name}` } : project?.screenshots?.[0])
-    ?? null
-  if (project) {
-    if (!previousProject) previousFocus = document.activeElement
-    await nextTick()
-    if (activeProject.value === project) closeButton.value?.focus()
-  } else {
-    previousFocus?.focus()
-    previousFocus = null
-  }
-}, { flush: 'post' })
+watch(
+  activeProject,
+  async (project, previousProject) => {
+    selectedScreenshot.value =
+      project?.screenshots?.find(screenshot => screenshot.src === project.imageUrl) ??
+      (project?.imageUrl
+        ? { src: project.imageUrl, alt: `Screenshot ${project.name}` }
+        : project?.screenshots?.[0]) ??
+      null
+    if (project) {
+      if (!previousProject) previousFocus = document.activeElement
+      await nextTick()
+      if (activeProject.value === project) closeButton.value?.focus()
+    } else {
+      previousFocus?.focus()
+      previousFocus = null
+    }
+  },
+  { flush: 'post' }
+)
 </script>
 
 <template>
@@ -90,13 +146,13 @@ watch(activeProject, async (project, previousProject) => {
       @touchmove.self.prevent
     >
       <div ref="dialog" class="lightbox-dialog" @click.stop>
-        <!-- Modal Top Bar: Header + Sub-headline + Tech Stack Badges -->
+        <!-- Modal Top Bar -->
         <header class="lightbox-header">
           <div class="lightbox-header__info">
             <div class="lightbox-header__top-row">
               <span class="live-dot" aria-hidden="true" />
               <h3 :id="`lightbox-title-${activeProject.id}`" class="lightbox-title">
-                {{ activeProject.name }}
+                {{ pick(activeProject.name, activeProject.nameEn) }}
               </h3>
               <span v-if="activeProject.domain" class="lightbox-domain">
                 {{ activeProject.domain }}
@@ -106,12 +162,14 @@ watch(activeProject, async (project, previousProject) => {
               </span>
             </div>
 
-            <!-- Sub-headline immediately under project title -->
-            <p v-if="activeProject.description" class="lightbox-subheadline">
-              {{ activeProject.description }}
+            <p v-if="activeProject.role" class="font-mono text-xs font-semibold text-amber-600 dark:text-amber-400">
+              {{ pick(activeProject.role, activeProject.roleEn) }}
             </p>
 
-            <!-- Tech Stack Badges directly beneath Sub-headline -->
+            <p v-if="activeProject.description" class="lightbox-subheadline">
+              {{ pick(activeProject.description, activeProject.descriptionEn) }}
+            </p>
+
             <div v-if="activeProject.techStack?.length" class="lightbox-tech-pills">
               <span
                 v-for="tech in activeProject.techStack"
@@ -124,12 +182,35 @@ watch(activeProject, async (project, previousProject) => {
           </div>
 
           <div class="lightbox-header__actions">
-            <span class="lightbox-shortcut-hint" aria-hidden="true">ESC</span>
+            <!-- Nút chuyển dự án trước / sau cho 3 Core Case Studies -->
+            <div v-if="currentCoreIndex !== -1" class="hidden sm:flex items-center gap-1 mr-1">
+              <button
+                type="button"
+                class="lightbox-nav-btn"
+                :title="pick('Case Study trước (←)', 'Previous Case Study (←)')"
+                @click="navigateCoreCase(-1)"
+              >
+                ←
+              </button>
+              <span class="font-mono text-[11px] font-bold text-slate-400 px-1">
+                0{{ currentCoreIndex + 1 }}/0{{ coreCaseOrder.length }}
+              </span>
+              <button
+                type="button"
+                class="lightbox-nav-btn"
+                :title="pick('Case Study tiếp theo (→)', 'Next Case Study (→)')"
+                @click="navigateCoreCase(1)"
+              >
+                →
+              </button>
+            </div>
+
+            <span class="lightbox-shortcut-hint hidden sm:inline-block" aria-hidden="true">ESC</span>
             <button
               ref="closeButton"
               type="button"
               class="lightbox-close-btn"
-              aria-label="Đóng cửa sổ phóng to (Escape)"
+              :aria-label="pick('Đóng cửa sổ (Escape)', 'Close modal (Escape)')"
               @click="closeLightbox"
             >
               <svg
@@ -151,8 +232,11 @@ watch(activeProject, async (project, previousProject) => {
 
         <!-- Modal Body Content -->
         <div class="lightbox-body">
-          <!-- 1. Mockup Stage (Compact Visual Preview) -->
-          <section class="lightbox-stage" :aria-label="selectedScreenshot ? 'Ảnh chụp sản phẩm thực tế' : 'Khung mô phỏng giao diện'">
+          <!-- 1. Mockup / Screenshot Stage -->
+          <section
+            class="lightbox-stage"
+            :aria-label="selectedScreenshot ? pick('Ảnh chụp sản phẩm thực tế', 'Production screenshot') : pick('Khung mô phỏng giao diện', 'Interactive architecture preview')"
+          >
             <div class="stage-container">
               <img
                 v-if="selectedScreenshot"
@@ -165,72 +249,120 @@ watch(activeProject, async (project, previousProject) => {
                 :project="activeProject"
                 lightbox
               />
-              <p v-if="selectedScreenshot" class="mt-3 text-center text-xs">
-                <a :href="resolveProjectUrl(selectedScreenshot.src)" target="_blank" rel="noopener noreferrer" class="font-semibold text-amber-700 underline underline-offset-2 dark:text-amber-400">Mở ảnh đầy đủ ↗</a>
+              <p v-if="selectedScreenshot" class="mt-2.5 text-center text-xs">
+                <a
+                  :href="resolveProjectUrl(selectedScreenshot.src)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="font-semibold text-amber-700 underline underline-offset-2 dark:text-amber-400"
+                >
+                  {{ pick('Mở ảnh kích thước đầy đủ ↗', 'Open full-resolution image ↗') }}
+                </a>
               </p>
-              <div v-if="activeProject.screenshots?.length > 1" class="screenshot-options" role="group" aria-label="Chọn ảnh dự án">
+              <div
+                v-if="activeProject.screenshots?.length > 1"
+                class="screenshot-options"
+                role="group"
+                :aria-label="pick('Chọn ảnh dự án', 'Select screenshot')"
+              >
                 <button
                   v-for="screenshot in activeProject.screenshots"
                   :key="screenshot.src"
                   type="button"
                   :aria-pressed="selectedScreenshot?.src === screenshot.src"
                   @click="selectedScreenshot = screenshot"
-                >{{ screenshot.label }}</button>
+                >
+                  {{ screenshot.label }}
+                </button>
               </div>
             </div>
           </section>
 
-          <!-- 2. Engineering Studio -->
+          <!-- 2. STAR Case Study Details -->
           <div class="lightbox-details">
-            <!-- Key Metrics Section: 4 cards reduced by 30% with subtle slate-50 background & fine border -->
+            <!-- Key Metrics Row (4 cards) -->
             <div v-if="activeProject.caseStudy?.metrics?.length" class="metrics-row">
               <div
                 v-for="metric in activeProject.caseStudy.metrics"
                 :key="metric.label"
                 class="metric-box-compact"
               >
-                <span class="metric-val-compact">{{ metric.value }}</span>
-                <span class="metric-lbl-compact">{{ metric.label }}</span>
+                <span class="metric-val-compact">{{ pick(metric.value, metric.valueEn) }}</span>
+                <span class="metric-lbl-compact">{{ pick(metric.label, metric.labelEn) }}</span>
               </div>
             </div>
 
-            <!-- 3 Cột (Bài toán & Giải pháp): Challenge, Solution, Impact (Thin subtle border, refined icons) -->
+            <!-- 3 Cột STAR: Challenge (S+T) -> Approach (Action bullets) -> Impact (Result) -->
             <div v-if="activeProject.caseStudy" class="pillars-3cols">
-              <!-- Cột 1: Thách thức kỹ thuật -->
+              <!-- Cột 1: Challenge (Situation + Task) -->
               <div class="pillar-col">
                 <div class="pillar-col__head">
                   <span class="pillar-col__icon">⚡</span>
-                  <strong>Thách thức kỹ thuật</strong>
+                  <strong>{{ pick('Bài toán & Nhiệm vụ (Challenge)', 'Challenge (Situation & Task)') }}</strong>
                 </div>
                 <p class="pillar-col__text">
-                  {{ activeProject.caseStudy.challenge }}
+                  {{ pick(activeProject.caseStudy.challenge, activeProject.caseStudy.challengeEn) }}
                 </p>
               </div>
 
-              <!-- Cột 2: Giải pháp Frontend -->
+              <!-- Cột 2: Approach (Action Bullets) -->
               <div class="pillar-col">
                 <div class="pillar-col__head">
                   <span class="pillar-col__icon">⚙</span>
-                  <strong>Giải pháp kỹ thuật</strong>
+                  <strong>{{ pick('Giải pháp & Hành động (Approach)', 'Approach & Technical Actions') }}</strong>
                 </div>
-                <p class="pillar-col__text">
-                  {{ activeProject.caseStudy.solution }}
+                <ul v-if="caseActions.length" class="pillar-col__list">
+                  <li v-for="(act, idx) in caseActions" :key="idx">
+                    {{ act }}
+                  </li>
+                </ul>
+                <p v-else class="pillar-col__text">
+                  {{ pick(activeProject.caseStudy.solution, activeProject.caseStudy.solutionEn) }}
                 </p>
               </div>
 
-              <!-- Cột 3: Tác động & Kết quả -->
+              <!-- Cột 3: Impact (Result + Scope Note) -->
               <div class="pillar-col">
                 <div class="pillar-col__head">
                   <span class="pillar-col__icon">✓</span>
-                  <strong>Tác động &amp; Kết quả</strong>
+                  <strong>{{ pick('Tác động & Kết quả (Impact)', 'Impact & Quantified Results') }}</strong>
                 </div>
                 <p class="pillar-col__text">
-                  {{ activeProject.caseStudy.impact }}
+                  {{ pick(activeProject.caseStudy.impact, activeProject.caseStudy.impactEn) }}
                 </p>
+
+                <!-- Hộp phân định ranh giới phụ trách (Scope Note) -->
+                <div v-if="activeProject.caseStudy.scopeNote" class="scope-note-box">
+                  <div class="scope-note-item">
+                    <strong class="text-emerald-600 dark:text-emerald-400">
+                      {{ pick('• Phần mình phụ trách:', '• My ownership:') }}
+                    </strong>
+                    <span>{{ pick(activeProject.caseStudy.scopeNote.mine, activeProject.caseStudy.scopeNote.mineEn) }}</span>
+                  </div>
+                  <div class="scope-note-item mt-1.5">
+                    <strong class="text-slate-500 dark:text-slate-400">
+                      {{ pick('• Phần đội hạ tầng:', '• Partner team scope:') }}
+                    </strong>
+                    <span>{{ pick(activeProject.caseStudy.scopeNote.others, activeProject.caseStudy.scopeNote.othersEn) }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Fallback Achievements for non-caseStudy projects -->
+            <!-- Khung trích dẫn Tư duy giải quyết vấn đề (Problem-Solving Insight) -->
+            <blockquote
+              v-if="activeProject.caseStudy?.insight"
+              class="insight-banner"
+            >
+              <div class="insight-banner__label">
+                🧠 {{ pick('Tư duy giải quyết vấn đề (Problem-Solving Insight)', 'Problem-Solving Insight') }}
+              </div>
+              <p class="insight-banner__quote">
+                “{{ pick(activeProject.caseStudy.insight, activeProject.caseStudy.insightEn) }}”
+              </p>
+            </blockquote>
+
+            <!-- Fallback Achievements cho các dự án không có caseStudy -->
             <div v-else-if="achievements.length" class="achievements-compact">
               <ul class="achievements-checklist" role="list">
                 <li v-for="(achievement, index) in achievements" :key="index">
@@ -245,33 +377,52 @@ watch(activeProject, async (project, previousProject) => {
               </ul>
             </div>
 
-            <!-- Direct Actions / Demo Buttons if available -->
-            <div v-if="detailedDemos.length > 0 || projectLinks.length > 0" class="actions-compact-row">
-              <template v-if="detailedDemos.length > 0">
-                <template v-for="demo in detailedDemos" :key="demo.id">
-                  <a
-                    v-if="demo.desktopUrl"
-                    :href="resolveProjectUrl(demo.desktopUrl)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="btn-demo-compact"
-                  >
-                    <span>🖥 {{ demo.label }} (Bản PC)</span>
-                    <BaseIcon name="external" class="mini-ext" />
-                  </a>
-                  <a
-                    v-if="demo.mobileUrl"
-                    :href="resolveProjectUrl(demo.mobileUrl)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="btn-demo-compact"
-                  >
-                    <span>📱 {{ demo.label }} (Bản Mobile)</span>
-                    <BaseIcon name="external" class="mini-ext" />
-                  </a>
+            <!-- Direct Actions / Demo Buttons + Mobile Prev/Next -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div v-if="detailedDemos.length > 0 || projectLinks.length > 0" class="actions-compact-row">
+                <template v-if="detailedDemos.length > 0">
+                  <template v-for="demo in detailedDemos" :key="demo.id">
+                    <a
+                      v-if="demo.desktopUrl"
+                      :href="resolveProjectUrl(demo.desktopUrl)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn-demo-compact"
+                    >
+                      <span>🖥 {{ pick(demo.label, demo.labelEn) }} (PC)</span>
+                      <BaseIcon name="external" class="mini-ext" />
+                    </a>
+                    <a
+                      v-if="demo.mobileUrl"
+                      :href="resolveProjectUrl(demo.mobileUrl)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn-demo-compact"
+                    >
+                      <span>📱 {{ pick(demo.label, demo.labelEn) }} (Mobile)</span>
+                      <BaseIcon name="external" class="mini-ext" />
+                    </a>
+                  </template>
                 </template>
-              </template>
-              <ProductLinks v-else :links="projectLinks" compact />
+                <ProductLinks v-else :links="projectLinks" compact />
+              </div>
+
+              <div v-if="currentCoreIndex !== -1" class="flex items-center gap-2 ml-auto">
+                <button
+                  type="button"
+                  class="btn-demo-compact cursor-pointer"
+                  @click="navigateCoreCase(-1)"
+                >
+                  ← {{ pick('Dự án trước', 'Prev Case') }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-demo-compact cursor-pointer"
+                  @click="navigateCoreCase(1)"
+                >
+                  {{ pick('Dự án tiếp', 'Next Case') }} →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -288,8 +439,8 @@ watch(activeProject, async (project, previousProject) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(0.75rem, 2vw, 1.5rem);
-  background: rgba(10, 15, 29, 0.78);
+  padding: clamp(0.5rem, 2vw, 1.25rem);
+  background: rgba(10, 15, 29, 0.82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -301,7 +452,7 @@ watch(activeProject, async (project, previousProject) => {
 .lightbox-dialog {
   position: relative;
   width: 100%;
-  max-width: 980px;
+  max-width: 1080px;
   background: var(--surface-solid);
   border: 1px solid var(--border-strong, rgba(226, 232, 240, 0.3));
   border-radius: 18px;
@@ -315,17 +466,13 @@ watch(activeProject, async (project, previousProject) => {
 [data-theme="light"] .lightbox-dialog {
   background: #ffffff;
   border-color: #cbd5e1;
-  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
-/* =====================================================================
-   HEADER BAR
-   ===================================================================== */
 .lightbox-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 0.85rem 1.25rem 0.75rem;
+  padding: 0.9rem 1.25rem 0.8rem;
   border-bottom: 1px solid var(--border);
   background: var(--surface-solid);
   gap: 1rem;
@@ -361,7 +508,7 @@ watch(activeProject, async (project, previousProject) => {
 }
 
 .lightbox-title {
-  font-size: 1.12rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--text);
   margin: 0;
@@ -370,23 +517,23 @@ watch(activeProject, async (project, previousProject) => {
 }
 
 .lightbox-domain {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.1rem 0.45rem;
+  padding: 0.12rem 0.5rem;
   border-radius: 4px;
   background: var(--interactive-soft);
   color: var(--interactive-accent);
 }
 
 .lightbox-period {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--text-faint);
   font-family: var(--font-mono);
 }
 
 .lightbox-subheadline {
-  font-size: 0.82rem;
-  line-height: 1.4;
+  font-size: 0.85rem;
+  line-height: 1.45;
   color: var(--text-muted);
   margin: 0;
   font-weight: 500;
@@ -396,22 +543,21 @@ watch(activeProject, async (project, previousProject) => {
   color: #334155;
 }
 
-/* Tech pills in header */
 .lightbox-tech-pills {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.1rem;
+  margin-top: 0.15rem;
 }
 
 .tech-pill-compact {
-  padding: 0.12rem 0.5rem;
+  padding: 0.14rem 0.55rem;
   border-radius: 9999px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   color: var(--text-faint);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-family: var(--font-mono);
   font-weight: 600;
 }
@@ -425,9 +571,30 @@ watch(activeProject, async (project, previousProject) => {
 .lightbox-header__actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-shrink: 0;
-  margin-top: 0.1rem;
+}
+
+.lightbox-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.lightbox-nav-btn:hover {
+  border-color: #f59e0b;
+  color: #fbbf24;
 }
 
 .lightbox-shortcut-hint {
@@ -439,15 +606,14 @@ watch(activeProject, async (project, previousProject) => {
   font-size: 0.68rem;
   font-weight: 600;
   font-family: var(--font-mono);
-  user-select: none;
 }
 
 .lightbox-close-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--surface-solid);
@@ -459,8 +625,7 @@ watch(activeProject, async (project, previousProject) => {
 .lightbox-close-btn:hover {
   background: var(--bg-soft);
   color: var(--text);
-  border-color: var(--border-strong, #94a3b8);
-  transform: scale(1.05);
+  border-color: #f59e0b;
 }
 
 .close-icon {
@@ -468,9 +633,6 @@ watch(activeProject, async (project, previousProject) => {
   height: 16px;
 }
 
-/* =====================================================================
-   BODY LAYOUT
-   ===================================================================== */
 .lightbox-body {
   overflow-y: auto;
   flex: 1 1 auto;
@@ -478,9 +640,8 @@ watch(activeProject, async (project, previousProject) => {
   flex-direction: column;
 }
 
-/* Stage Area (Compact Mockup) */
 .lightbox-stage {
-  padding: 0.6rem 1.25rem 0.4rem;
+  padding: 0.65rem 1.25rem 0.5rem;
   background: var(--bg-soft);
   display: flex;
   align-items: center;
@@ -491,14 +652,14 @@ watch(activeProject, async (project, previousProject) => {
 
 .stage-container {
   width: 100%;
-  max-width: 940px;
+  max-width: 980px;
 }
 
 .lightbox-image {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  max-height: 50vh;
+  max-height: 44vh;
   object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -509,12 +670,12 @@ watch(activeProject, async (project, previousProject) => {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 0 0.35rem;
+  padding: 0.65rem 0 0.25rem;
 }
 
 .screenshot-options button {
-  min-height: 36px;
-  padding: 0.4rem 0.75rem;
+  min-height: 34px;
+  padding: 0.35rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-solid);
@@ -529,17 +690,11 @@ watch(activeProject, async (project, previousProject) => {
   font-weight: 700;
 }
 
-.screenshot-options button:focus-visible {
-  outline: 2px solid #d97706;
-  outline-offset: 3px;
-}
-
-/* Details Section */
 .lightbox-details {
-  padding: 0.75rem 1.25rem 0.9rem;
+  padding: 0.9rem 1.25rem 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.8rem;
   background: var(--surface-solid);
 }
 
@@ -547,79 +702,60 @@ watch(activeProject, async (project, previousProject) => {
   background: #ffffff;
 }
 
-/* =====================================================================
-   KEY METRICS SECTION (REDUCED 30%, SUBTLE SLATE-50 / SOFT BORDER)
-   ===================================================================== */
 .metrics-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 .metric-box-compact {
-  padding: 0.45rem 0.7rem;
-  border-radius: 9px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  transition: border-color 180ms ease;
+  gap: 0.15rem;
 }
 
 [data-theme="dark"] .metric-box-compact {
-  background: rgba(30, 41, 59, 0.4);
-  border-color: rgba(51, 65, 85, 0.5);
-}
-
-.metric-box-compact:hover {
-  border-color: #cbd5e1;
-}
-
-[data-theme="dark"] .metric-box-compact:hover {
-  border-color: rgba(100, 116, 139, 0.6);
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(51, 65, 85, 0.65);
 }
 
 .metric-val-compact {
-  font-size: 1.08rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: var(--text);
-  font-family: var(--font-display, var(--font-sans));
+  color: #f59e0b;
+  font-family: var(--font-mono);
   line-height: 1.2;
 }
 
 [data-theme="light"] .metric-val-compact {
-  color: #0f172a;
+  color: #b45309;
 }
 
 .metric-lbl-compact {
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
 }
 
-/* =====================================================================
-   3-COLUMN SECTION (CHALLENGE / SOLUTION / IMPACT)
-   ===================================================================== */
 .pillars-3cols {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.75rem;
 }
 
 .pillar-col {
-  padding: 0.6rem 0.8rem;
-  border-radius: 9px;
+  padding: 0.8rem 0.95rem;
+  border-radius: 12px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.45rem;
 }
 
 [data-theme="light"] .pillar-col {
@@ -630,31 +766,103 @@ watch(activeProject, async (project, previousProject) => {
 .pillar-col__head {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-  font-weight: 700;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 800;
   color: var(--text);
 }
 
 .pillar-col__icon {
-  font-size: 0.78rem;
-  opacity: 0.85;
+  font-size: 0.88rem;
 }
 
 .pillar-col__text {
-  font-size: 0.76rem;
-  line-height: 1.48;
+  font-size: 0.84rem;
+  line-height: 1.58;
   color: var(--text-muted);
   margin: 0;
 }
 
 [data-theme="light"] .pillar-col__text {
+  color: #334155;
+}
+
+.pillar-col__list {
+  margin: 0;
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  line-height: 1.52;
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .pillar-col__list {
+  color: #334155;
+}
+
+.scope-note-box {
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.35);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .scope-note-box {
+  background: #ffffff;
+  border-color: #cbd5e1;
   color: #475569;
 }
 
-/* Fallback Achievements */
+.scope-note-item strong {
+  display: block;
+  margin-bottom: 0.1rem;
+}
+
+.insight-banner {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border-left: 4px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+[data-theme="light"] .insight-banner {
+  background: #fffbeb;
+}
+
+.insight-banner__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fbbf24;
+}
+
+[data-theme="light"] .insight-banner__label {
+  color: #b45309;
+}
+
+.insight-banner__quote {
+  margin: 0;
+  font-size: 0.88rem;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--text);
+}
+
 .achievements-compact {
-  padding: 0.5rem 0;
+  padding: 0.4rem 0;
 }
 
 .achievements-checklist {
@@ -663,29 +871,29 @@ watch(activeProject, async (project, previousProject) => {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
 .achievements-checklist li {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .check-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: rgba(16, 185, 129, 0.15);
   color: #10b981;
   font-weight: 700;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   flex-shrink: 0;
   margin-top: 0.15rem;
 }
@@ -695,27 +903,23 @@ watch(activeProject, async (project, previousProject) => {
   color: var(--interactive-accent);
 }
 
-/* =====================================================================
-   ACTIONS COMPACT ROW
-   ===================================================================== */
 .actions-compact-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.45rem;
-  padding-top: 0.15rem;
 }
 
 .btn-demo-compact {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 7px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   color: var(--text);
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 180ms ease;
@@ -727,19 +931,15 @@ watch(activeProject, async (project, previousProject) => {
 }
 
 .btn-demo-compact:hover {
-  background: var(--interactive-soft);
-  border-color: var(--interactive-accent);
-  color: var(--interactive-accent);
+  border-color: #f59e0b;
+  color: #fbbf24;
 }
 
 .mini-ext {
-  width: 0.72rem;
-  height: 0.72rem;
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
-/* =====================================================================
-   TRANSITIONS & RESPONSIVE
-   ===================================================================== */
 .lightbox-fade-enter-active,
 .lightbox-fade-leave-active {
   transition: opacity 220ms ease;
@@ -750,28 +950,15 @@ watch(activeProject, async (project, previousProject) => {
   opacity: 0;
 }
 
-.lightbox-fade-enter-active .lightbox-dialog {
-  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
-}
-
-.lightbox-fade-leave-active .lightbox-dialog {
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-
-.lightbox-fade-enter-from .lightbox-dialog {
-  opacity: 0;
-  transform: scale(0.96) translateY(8px);
-}
-
-.lightbox-fade-leave-to .lightbox-dialog {
-  opacity: 0;
-  transform: scale(0.98) translateY(4px);
-}
-
 @media (max-width: 768px) {
+  .lightbox-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
   .lightbox-dialog {
     max-height: 96vh;
-    border-radius: 14px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
   .metrics-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -109,7 +109,7 @@ const hasSandbox = computed(() => ['landing-pages', 'government-map', 'experimen
           <div class="preview-landing__links">
             <span>Chiến dịch</span>
             <span>Bản đồ xanh</span>
-            <span class="preview-btn-mini">Tham gia</span>
+            <span class="preview-btn-mini">Khám phá</span>
           </div>
         </div>
         <div class="preview-landing__hero">
@@ -132,9 +132,9 @@ const hasSandbox = computed(() => ['landing-pages', 'government-map', 'experimen
         <div class="preview-map__overlay">
           <div class="preview-map__hud">
             <div class="hud-item hud-item--live">
-              <span class="pulse-indicator" /> Lớp dữ liệu: <strong>Cảnh báo lũ quét &amp; Rủi ro</strong>
+              <span class="pulse-indicator" /> Lớp dữ liệu: <strong>QGIS · -91% GeoJSON (33→3 MB)</strong>
             </div>
-            <div class="hud-coords">21.0285° N, 105.8542° E · Zoom 11x</div>
+            <div class="hud-coords">60 FPS Smooth Pan/Zoom · 02 Cổng thông tin</div>
           </div>
           <!-- Simulated Map Markers -->
           <div class="map-marker marker-alert" style="top: 28%; left: 38%;">
@@ -161,28 +161,28 @@ const hasSandbox = computed(() => ['landing-pages', 'government-map', 'experimen
       <div v-else-if="project.id === 'experiments'" class="preview-ab">
         <div class="preview-ab__header">
           <div class="preview-ab__title">
-            <span class="badge-tag">A/B Experiment #882</span>
-            <strong>Thuật toán gợi ý tin tự động (BigData Engine)</strong>
+            <span class="badge-tag">40 Sites · 309 Boxes</span>
+            <strong>Recommendation &amp; A/B Testing (Macro Engine &amp; TOTP CDN)</strong>
           </div>
-          <span class="badge-status">Realtime Ingestion</span>
+          <span class="badge-status">FDR = 0.05</span>
         </div>
         <div class="preview-ab__split">
           <div class="ab-card ab-card--control">
             <div class="ab-card__tag">Variant A (Control)</div>
             <div class="ab-card__metric">4.12% <span>CTR</span></div>
             <div class="ab-card__bar"><div class="bar-fill" style="width: 48%;" /></div>
-            <span class="ab-card__sub">48.2% Traffic Allocation</span>
+            <span class="ab-card__sub">50% Traffic Split · Multi-step Config</span>
           </div>
           <div class="ab-card ab-card--variant">
-            <div class="ab-card__tag">Variant B (Neural v2) <span class="winner-chip">★ Winner</span></div>
+            <div class="ab-card__tag">Variant B (Algo v2) <span class="winner-chip">★ Passed FDR</span></div>
             <div class="ab-card__metric text-emerald-600">5.86% <span>CTR (+42.2%)</span></div>
             <div class="ab-card__bar"><div class="bar-fill bar-fill--winner" style="width: 76%;" /></div>
-            <span class="ab-card__sub">51.8% Traffic Allocation</span>
+            <span class="ab-card__sub">50% Traffic Split · Significance Badge</span>
           </div>
         </div>
         <div class="preview-ab__footer">
-          <span>Quy mô: <strong>10.000.000+ sự kiện/ngày</strong></span>
-          <span>Độ tin cậy: <strong>p &lt; 0.001 (99.9%)</strong></span>
+          <span>Vận hành: <strong>Backoff Retry &amp; Telegram Dedup Alert</strong></span>
+          <span>Kiểm định: <strong>FDR = 0.05 (Significant)</strong></span>
         </div>
       </div>
 
@@ -194,7 +194,7 @@ const hasSandbox = computed(() => ['landing-pages', 'government-map', 'experimen
             <strong>Bizfly Dynamic QR &amp; Shortlink</strong>
           </div>
           <div class="qr-badge-live">
-            <span class="live-dot" /> Redis Sync Active
+            <span class="live-dot" /> MySQL ⇄ Redis Sync
           </div>
         </div>
 
@@ -249,22 +249,22 @@ const hasSandbox = computed(() => ['landing-pages', 'government-map', 'experimen
 
             <div class="routing-stats-grid">
               <div class="routing-stat-box">
-                <span class="stat-number text-sky-400">~10K</span>
-                <span class="stat-name">Clicks / ngày</span>
+                <span class="stat-number text-sky-400">~240K</span>
+                <span class="stat-name">Peak clicks/ngày</span>
               </div>
               <div class="routing-stat-box">
-                <span class="stat-number text-emerald-400">Redis</span>
-                <span class="stat-name">Sync từ MySQL</span>
+                <span class="stat-number text-emerald-400">25–60ms</span>
+                <span class="stat-name">Redis Key Read</span>
               </div>
               <div class="routing-stat-box">
-                <span class="stat-number text-amber-300">API Log</span>
-                <span class="stat-name">Location &bull; Device</span>
+                <span class="stat-number text-amber-300">2M+</span>
+                <span class="stat-name">Total Clicks</span>
               </div>
             </div>
 
             <div class="routing-status-badge">
               <span class="status-pulse-dot" />
-              <span>Đổi URL linh hoạt &bull; Không cần in lại ấn phẩm</span>
+              <span>Đổi URL đích linh hoạt &bull; VirusTotal Scan &bull; Không in lại QR</span>
             </div>
           </div>
         </div>

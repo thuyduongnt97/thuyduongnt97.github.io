@@ -1,7 +1,14 @@
 /**
- * v-reveal — hiện dần phần tử khi cuộn tới.
- * Dùng: <div v-reveal> hoặc <div v-reveal="80"> (80 = độ trễ ms).
- * Lưu ý: không dùng trên phần tử có :class động (Vue sẽ ghi đè class `reveal`).
+ * v-reveal — hiện dần phần tử khi cuộn tới, hỗ trợ nhiều kiểu animation.
+ *
+ * Cú pháp:
+ *   <div v-reveal>                     → fade-up mặc định
+ *   <div v-reveal="100">               → fade-up với delay 100ms
+ *   <div v-reveal="'left'">            → slide-in từ trái
+ *   <div v-reveal="'right'">           → slide-in từ phải
+ *   <div v-reveal="'scale'">           → fade-scale từ nhỏ
+ *   <div v-reveal="'up'">              → fade-up (explicit)
+ *   <div v-reveal="{ type: 'left', delay: 200 }">  → object config
  */
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let observer
@@ -17,17 +24,25 @@ function getObserver() {
           }
         })
       },
-      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+      { threshold: 0.08, rootMargin: '0px 0px -4% 0px' },
     )
   }
   return observer
 }
 
+function parseBinding(value) {
+  if (value == null) return { type: 'up', delay: 0 }
+  if (typeof value === 'number') return { type: 'up', delay: value }
+  if (typeof value === 'string') return { type: value, delay: 0 }
+  if (typeof value === 'object') return { type: value.type || 'up', delay: value.delay || 0 }
+  return { type: 'up', delay: 0 }
+}
+
 export const reveal = {
-  // beforeMount chạy SAU khi attribute/class tĩnh được gán nên không bị ghi đè
   beforeMount(el, { value }) {
-    el.classList.add('reveal')
-    if (value) el.style.setProperty('--d', `${value}ms`)
+    const { type, delay } = parseBinding(value)
+    el.classList.add('reveal', `reveal--${type}`)
+    if (delay) el.style.setProperty('--d', `${delay}ms`)
   },
   mounted(el) {
     if (reduceMotion || !('IntersectionObserver' in window)) {

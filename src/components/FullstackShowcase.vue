@@ -8,10 +8,10 @@ const tabs = [
   { id: 'webgis', label: 'WebGIS / 60FPS', fileName: 'webgis-clustering-demo.vue' },
 ]
 const steps = [
-  { label: 'User Scan / Click', detail: 'Dynamic QR / Shortlink', icon: '↗' },
-  { label: 'Redis Cache', detail: '~10k clicks/link/ngày', icon: '⚡' },
-  { label: 'Async Log Queue', detail: 'Tracking tách khỏi luồng redirect', icon: '⇢' },
-  { label: 'Laravel API & Vue Dashboard', detail: 'MySQL & REST API Analytics', icon: '⌘' },
+  { label: 'Vue Admin & VirusTotal', detail: 'Tạo Shortlink/QR + Quét độc hại URL', icon: '↗' },
+  { label: 'MySQL ⇄ Redis Key Sync', detail: 'Đồng bộ key sang Redis (~240K clicks/ngày)', icon: '⚡' },
+  { label: 'Redirect Service (25–60ms)', detail: 'Đọc trực tiếp từ Redis, không query MySQL', icon: '⇢' },
+  { label: 'Log REST API → Analytics UI', detail: 'Tổng hợp Location/Device/OS/Browser', icon: '⌘' },
 ]
 const activeTab = ref('architecture')
 const activeStep = ref(-1)

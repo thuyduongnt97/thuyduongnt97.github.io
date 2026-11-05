@@ -68,18 +68,16 @@ function handleAccent(accentId, label) {
 const commandItems = [
   // 1. Quick Navigation to Sections
   { id: 'sec-hero', title: 'Về tôi (Giới thiệu & Định vị)', category: 'Chuyển nhanh Section', icon: 'sparkle', action: () => scrollToSection('hero') },
+  { id: 'sec-exp', title: 'Case Studies & Dự án thực chiến', category: 'Chuyển nhanh Section', icon: 'layers', action: () => scrollToSection('deliverables') },
+  { id: 'sec-about', title: 'Tư duy kỹ thuật & Giải quyết vấn đề (About)', category: 'Chuyển nhanh Section', icon: 'sparkle', action: () => scrollToSection('about') },
   { id: 'sec-skills', title: 'Kỹ năng chuyên môn (Bento Architecture)', category: 'Chuyển nhanh Section', icon: 'code', action: () => scrollToSection('skills') },
-  { id: 'sec-exp', title: 'Dự án tiêu biểu (Visual Case Studies)', category: 'Chuyển nhanh Section', icon: 'layers', action: () => scrollToSection('experience') },
-  { id: 'sec-timeline', title: 'Lịch sử sự nghiệp (Career Timeline & Milestones)', category: 'Chuyển nhanh Section', icon: 'briefcase', action: () => scrollToSection('timeline') },
-  { id: 'sec-edu', title: 'Học vấn & Bằng cấp', category: 'Chuyển nhanh Section', icon: 'cap', action: () => scrollToSection('timeline') },
-  { id: 'sec-vitals', title: 'Kỹ năng tối ưu hiệu năng & Core Web Vitals', category: 'Kỹ năng chuyên môn', icon: 'zap', action: () => scrollToSection('skill-matrix') },
-  { id: 'sec-contact', title: 'Liên hệ & Hợp tác', category: 'Chuyển nhanh Section', icon: 'mail', action: () => scrollToSection('contact') },
+  { id: 'sec-vitals', title: 'Ma trận kỹ năng chi tiết', category: 'Kỹ năng chuyên môn', icon: 'zap', action: () => scrollToSection('skill-matrix') },
 
   // 2. Tech Stack Filter & Deep-links
-  { id: 'tech-vue', title: 'Lọc dự án: Vue / Nuxt.js', category: 'Bộ lọc công nghệ', icon: 'code', action: () => handleFilter('vue', 'Vue / Nuxt') },
-  { id: 'tech-adtech', title: 'Lọc dự án: PHP / Laravel & AdTech', category: 'Bộ lọc công nghệ', icon: 'code', action: () => handleFilter('adtech', 'PHP / Laravel & AdTech') },
-  { id: 'tech-ds', title: 'Lọc dự án: Design System & UI', category: 'Bộ lọc công nghệ', icon: 'layers', action: () => handleFilter('design-system', 'Design System & UI') },
-  { id: 'tech-perf', title: 'Lọc dự án: Performance Optimization & GIS', category: 'Bộ lọc công nghệ', icon: 'zap', action: () => handleFilter('perf', 'Performance Optimization') },
+  { id: 'tech-vue', title: 'Lọc dự án: Vue.js & Frontend Architecture', category: 'Bộ lọc công nghệ', icon: 'code', action: () => handleFilter('frontend', 'Vue.js & Frontend') },
+  { id: 'tech-adtech', title: 'Lọc dự án: Laravel, Redis & AdTech', category: 'Bộ lọc công nghệ', icon: 'code', action: () => handleFilter('adtech', 'Laravel, Redis & AdTech') },
+  { id: 'tech-ds', title: 'Lọc dự án: Interactive Media & UI Systems', category: 'Bộ lọc công nghệ', icon: 'layers', action: () => handleFilter('ui-systems', 'Interactive Media & UI') },
+  { id: 'tech-perf', title: 'Lọc dự án: WebGIS, QGIS & GeoJSON', category: 'Bộ lọc công nghệ', icon: 'zap', action: () => handleFilter('gis', 'WebGIS & GeoJSON') },
   { id: 'tech-ts', title: 'Kỹ năng: TypeScript & JavaScript ES6+', category: 'Kỹ năng chuyên môn', icon: 'code', action: () => scrollToSection('skills', '⚡ Khám phá kỹ năng TypeScript & ES6+') },
   { id: 'tech-tw', title: 'Kỹ năng: Tailwind CSS & Design System Architecture', category: 'Kỹ năng chuyên môn', icon: 'layers', action: () => scrollToSection('skills', '⚡ Khám phá kỹ năng Tailwind & Design System') },
   { id: 'tech-gsap', title: 'Kỹ năng: GSAP Animation & SVG Manipulation', category: 'Kỹ năng chuyên môn', icon: 'zap', action: () => scrollToSection('skills', '⚡ Khám phá kỹ năng GSAP Animation') },
@@ -97,14 +95,11 @@ const commandItems = [
   { id: 'acc-amber', title: 'Đổi Accent: Amber (Hổ phách)', category: 'Bảng màu Accent', icon: 'sparkle', action: () => handleAccent('amber', 'Amber') },
 
   // 5. Featured Projects
-  { id: 'proj-omo', title: 'OMO — Gieo triệu mầm xanh (FMCG Campaign)', category: 'Dự án tiêu biểu', icon: 'external', action: () => scrollToSection('project-landing-pages') },
-  { id: 'proj-athena', title: 'Landing page Athena (MarTech)', category: 'Dự án tiêu biểu', icon: 'external', action: () => scrollToSection('project-landing-pages') },
-  { id: 'proj-gis', title: 'Bản đồ số & GIS Layers (Leaflet GovTech)', category: 'Dự án tiêu biểu', icon: 'map', action: () => scrollToSection('project-government-map') },
-  { id: 'proj-exp', title: 'Recommendation & A/B Testing Engine (BigData)', category: 'Dự án tiêu biểu', icon: 'layers', action: () => scrollToSection('project-experiments') },
-  { id: 'proj-maps', title: 'Interactive Báo Giao thông (Cao tốc & Hầm)', category: 'Dự án tiêu biểu', icon: 'map', action: () => scrollToSection('project-maps') },
-  { id: 'proj-ads', title: 'Ads Demo Simulator & Template Core Engine', category: 'Dự án tiêu biểu', icon: 'play', action: () => scrollToSection('project-ads') },
-  { id: 'proj-emag', title: 'Emagazine Báo chí & Scrollytelling', category: 'Dự án tiêu biểu', icon: 'zap', action: () => scrollToSection('project-emagazines') },
-  { id: 'proj-ai', title: 'Camera Check-in & AI Vinh danh', category: 'Dự án tiêu biểu', icon: 'sparkle', action: () => scrollToSection('project-recognition-event') },
+  { id: 'proj-qr', title: 'Dynamic QR & Shortlink (2M+ Clicks, Redis Sync)', category: 'Dự án tiêu biểu', icon: 'zap', action: () => scrollToSection('deliverables') },
+  { id: 'proj-exp', title: 'Recommendation & A/B Testing (40 Sites · 309 Boxes)', category: 'Dự án tiêu biểu', icon: 'layers', action: () => scrollToSection('deliverables') },
+  { id: 'proj-gis', title: 'Bản đồ số WebGIS (-91% GeoJSON · 60 FPS)', category: 'Dự án tiêu biểu', icon: 'map', action: () => scrollToSection('deliverables') },
+  { id: 'proj-ads', title: 'Ads Demo Simulator & Template Core Engine', category: 'Dự án tiêu biểu', icon: 'play', action: () => scrollToSection('deliverables') },
+  { id: 'proj-emag', title: 'Emagazine Báo chí & Chiến dịch Thương hiệu', category: 'Dự án tiêu biểu', icon: 'external', action: () => scrollToSection('deliverables') },
 ]
 
 const filteredItems = computed(() => {

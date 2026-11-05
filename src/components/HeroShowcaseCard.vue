@@ -1,31 +1,58 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useLocale } from '../composables/useLocale'
+
+const { pick } = useLocale()
 
 const tabs = [
-  { id: 'fullstack', label: 'Fullstack / High-Load', fileName: 'fullstack-highload-architecture.ts', badge: 'Tải cao < 5ms' },
-  { id: 'webgis', label: 'WebGIS / 60FPS', fileName: 'webgis-clustering-demo.vue', badge: 'Interactive 60FPS' },
+  {
+    id: 'fullstack',
+    label: 'Shortlink Data & Admin',
+    fileName: 'shortlink-data-contract.ts',
+    badge: 'Redirect 25–60ms',
+  },
+  {
+    id: 'webgis',
+    label: 'WebGIS / 60FPS',
+    fileName: 'webgis-clustering-demo.vue',
+    badge: '-91% GeoJSON · 60FPS',
+  },
 ]
 
-// Tab 1 (Fullstack / High-Load) is active by default as requested
 const activeTab = ref('fullstack')
 const tabButtons = ref([])
 const currentTab = computed(() => tabs.find(t => t.id === activeTab.value) || tabs[0])
 
-// 4 dòng thông số tóm tắt gọn gàng theo yêu cầu người dùng
 const specs = [
-  { label: '• Backend & High-Load:', value: 'PHP Laravel • MySQL • Redis', color: 'amber' },
-  { label: '• Web App & Core Widget:', value: 'Vue 2/3 • Svelte • Zero CLS', color: 'emerald' },
-  { label: '• Bản đồ số & Dữ liệu:', value: 'QGIS • Leaflet • MapSVG.js', color: 'cyan' },
+  { label: '• Backend & Data Layer:', value: 'Laravel • MySQL • Redis', color: 'amber' },
+  { label: '• Self-Service A/B Platform:', value: 'Vue 3 • 40 Sites • 309 Boxes', color: 'emerald' },
+  { label: '• WebGIS & Spatial Data:', value: 'QGIS (-91%) • Leaflet 60FPS', color: 'cyan' },
   { label: '• AI Workflow:', value: 'Codex • Antigravity • Gemini', color: 'purple' },
 ]
 
-// --- TAB 1 (Mặc định): Fullstack High-Load Architecture Flow Logic ---
-const steps = [
-  { label: 'QR / Shortlink', detail: 'Dynamic URL Routing', icon: '↗' },
-  { label: 'Redis Cache', detail: '< 5ms Redirect Cache', icon: '⚡' },
-  { label: 'Async Queue', detail: 'Tracking tách khỏi luồng', icon: '⇢' },
-  { label: 'MySQL & Vue CMS', detail: 'CMS & Analytics Báo cáo', icon: '⌘' },
-]
+// --- TAB 1: Luồng Dữ liệu & Quản trị Shortlink (đúng phạm vi phụ trách) ---
+const steps = computed(() => [
+  {
+    label: 'Vue Admin & VirusTotal',
+    detail: pick('Tạo link/QR & quét URL độc hại trước khi bật', 'Create link/QR & scan URL before activation'),
+    icon: '🛡',
+  },
+  {
+    label: 'MySQL ⇄ Redis Key Sync',
+    detail: pick('Lưu lớp ánh xạ DB & đồng bộ key-value Redis', 'Store indirection layer & sync Redis keys'),
+    icon: '⚡',
+  },
+  {
+    label: 'Redirect Service (25–60ms)',
+    detail: pick('Đội hạ tầng đọc trực tiếp từ key Redis', 'Infra team reads directly from Redis keys'),
+    icon: '↗',
+  },
+  {
+    label: 'Log REST API → Analytics UI',
+    detail: pick('Vẽ biểu đồ lưu lượng, Top referrers & locations', 'Charts for traffic, top referrers & locations'),
+    icon: '📊',
+  },
+])
 
 const activeStep = ref(-1)
 const isRunning = ref(false)
@@ -40,13 +67,13 @@ function stopFlow() {
 function replayFlow() {
   stopFlow()
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    activeStep.value = steps.length - 1
+    activeStep.value = steps.value.length - 1
     return
   }
   activeStep.value = 0
   isRunning.value = true
   flowTimer = setInterval(() => {
-    if (activeStep.value < steps.length - 1) {
+    if (activeStep.value < steps.value.length - 1) {
       activeStep.value += 1
     } else {
       stopFlow()
@@ -95,8 +122,9 @@ function drawGisFrame() {
   if (!gisCtx || !canvasW || !canvasH) return
   gisCtx.clearRect(0, 0, canvasW, canvasH)
 
-  // 1. Subtle Canvas Grid Lines
-  gisCtx.strokeStyle = 'rgba(30, 41, 59, 0.45)'
+  gisCtx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'light'
+    ? 'rgba(203, 213, 225, 0.5)'
+    : 'rgba(30, 41, 59, 0.45)'
   gisCtx.lineWidth = 0.5
   for (let x = 0; x < canvasW; x += 28) {
     gisCtx.beginPath()
@@ -111,7 +139,6 @@ function drawGisFrame() {
     gisCtx.stroke()
   }
 
-  // 2. Update and Draw Nodes
   let currentCluster = 0
   for (let i = 0; i < gisNodes.length; i++) {
     const node = gisNodes[i]
@@ -132,7 +159,6 @@ function drawGisFrame() {
       }
     }
 
-    // Draw connection lines to nearby nodes
     for (let j = i + 1; j < gisNodes.length; j++) {
       const other = gisNodes[j]
       const dist = Math.hypot(node.x - other.x, node.y - other.y)
@@ -146,7 +172,6 @@ function drawGisFrame() {
       }
     }
 
-    // Draw node circle
     gisCtx.beginPath()
     gisCtx.arc(node.x, node.y, inCluster ? node.r + 2 : node.r, 0, Math.PI * 2)
     gisCtx.fillStyle = inCluster ? '#fbbf24' : '#06b6d4'
@@ -158,7 +183,6 @@ function drawGisFrame() {
 
   clusterCount.value = currentCluster
 
-  // 3. Draw Radar Cluster Ring if pointer is active
   if (pointer.active) {
     gisCtx.beginPath()
     gisCtx.arc(pointer.x, pointer.y, CLUSTER_RADIUS, 0, Math.PI * 2)
@@ -168,7 +192,6 @@ function drawGisFrame() {
     gisCtx.stroke()
     gisCtx.setLineDash([])
 
-    // Pulse center
     gisCtx.beginPath()
     gisCtx.arc(pointer.x, pointer.y, 3.5, 0, Math.PI * 2)
     gisCtx.fillStyle = '#fbbf24'
@@ -246,8 +269,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="hero-showcase-card" aria-label="Khung kỹ thuật tương tác Fullstack & WebGIS">
-    <!-- Window Chrome Top Bar: Tên file mặc định fullstack-highload-architecture.ts -->
+  <div class="hero-showcase-card" :aria-label="pick('Khung kỹ thuật tương tác Fullstack & WebGIS', 'Interactive Fullstack & WebGIS Architecture Showcase')">
     <div class="card-chrome">
       <div class="window-dots" aria-hidden="true">
         <span />
@@ -263,8 +285,7 @@ onBeforeUnmount(() => {
       </span>
     </div>
 
-    <!-- 2 Tab Chuyển Đổi: Tab 1 (Fullstack / High-Load) bên trái, Tab 2 (WebGIS / 60FPS) bên phải -->
-    <div class="card-tabs" role="tablist" aria-label="Chọn mô phỏng kỹ thuật">
+    <div class="card-tabs" role="tablist" :aria-label="pick('Chọn mô phỏng kỹ thuật', 'Select technical simulation')">
       <button
         v-for="(tab, index) in tabs"
         :id="'showcase-tab-' + tab.id"
@@ -288,7 +309,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <!-- TAB 1 (MẶC ĐỊNH): Fullstack / High-Load Pipeline (Hiển thị đầy đủ, không cắt chữ) -->
+    <!-- TAB 1: Luồng Dữ liệu & Quản trị Shortlink -->
     <div
       v-show="activeTab === 'fullstack'"
       id="showcase-panel-fullstack"
@@ -298,7 +319,7 @@ onBeforeUnmount(() => {
       tabindex="0"
     >
       <div class="arch-header">
-        <span class="arch-caption">LUỒNG ĐIỀU HƯỚNG TẢI CAO (&lt; 5MS)</span>
+        <span class="arch-caption">{{ pick('LUỒNG DỮ LIỆU & QUẢN TRỊ SHORTLINK', 'SHORTLINK DATA CONTRACT & ADMIN') }}</span>
         <button
           type="button"
           class="replay-btn"
@@ -306,12 +327,11 @@ onBeforeUnmount(() => {
           @click="replayFlow"
         >
           <span aria-hidden="true">↻</span>
-          {{ isRunning ? 'Đang chạy' : 'Chạy luồng' }}
+          {{ isRunning ? pick('Đang chạy', 'Running') : pick('Chạy luồng', 'Simulate') }}
         </button>
       </div>
 
-      <!-- 4 Trạm Luồng Tải Cao (01 QR / Shortlink ➔ 02 Redis Cache ➔ 03 Async Queue ➔ 04 MySQL & Vue CMS) -->
-      <ol class="flow-track" aria-label="Sơ đồ luồng QR/Shortlink ➔ Redis Cache ➔ Async Queue ➔ MySQL & Vue CMS">
+      <ol class="flow-track" :aria-label="pick('Sơ đồ luồng dữ liệu và quản trị Shortlink', 'Shortlink data model and admin flow')">
         <li
           v-for="(step, index) in steps"
           :key="step.label"
@@ -333,14 +353,13 @@ onBeforeUnmount(() => {
         </li>
       </ol>
 
-      <!-- 2 Thống Kê Vận Hành Nổi Bật -->
       <div class="arch-metrics-bar">
-        <span class="pill-metric pill-metric--amber">⚡ ~10.000 clicks/link/ngày</span>
-        <span class="pill-metric pill-metric--cyan">🔥 2M+ Total Clicks</span>
+        <span class="pill-metric pill-metric--amber">⚡ {{ pick('Đỉnh ~240K clicks/ngày', 'Peak ~240K clicks/day') }}</span>
+        <span class="pill-metric pill-metric--cyan">🛡 2M+ Clicks · VirusTotal</span>
       </div>
     </div>
 
-    <!-- TAB 2: WebGIS / 60FPS (Canvas tương tác gom cụm) -->
+    <!-- TAB 2: WebGIS / 60FPS -->
     <div
       v-show="activeTab === 'webgis'"
       id="showcase-panel-webgis"
@@ -355,23 +374,21 @@ onBeforeUnmount(() => {
         ref="gisCanvasRef"
         class="webgis-canvas"
         role="img"
-        aria-label="Bản đồ số tương tác gom cụm 45 điểm tọa độ với hiệu ứng 60FPS"
+        :aria-label="pick('Bản đồ số tương tác gom cụm 45 điểm tọa độ với hiệu ứng 60FPS', 'Interactive WebGIS clustering 45 spatial nodes at 60FPS')"
       />
 
-      <!-- Overlay Tags trên Canvas -->
       <div class="canvas-tags-overlay pointer-events-none">
-        <span class="canvas-tag canvas-tag--cyan">QGIS Douglas-Peucker</span>
-        <span class="canvas-tag canvas-tag--amber">Leaflet Clustering</span>
+        <span class="canvas-tag canvas-tag--cyan">QGIS Simplification (-91%)</span>
+        <span class="canvas-tag canvas-tag--amber">Leaflet Canvas + Cluster</span>
       </div>
 
-      <!-- Thanh trạng thái dưới Canvas -->
       <div class="canvas-status-bar pointer-events-none">
         <span class="status-hint">
           <template v-if="pointer.active && clusterCount > 0">
-            <strong class="text-amber-400">🎯 {{ clusterCount }} điểm trong cụm</strong>
+            <strong class="text-amber-400">🎯 {{ clusterCount }} {{ pick('điểm trong cụm', 'nodes clustered') }}</strong>
           </template>
           <template v-else>
-            Rê chuột kiểm tra gom cụm
+            {{ pick('Rê chuột kiểm tra gom cụm', 'Hover to test marker clustering') }}
           </template>
         </span>
         <span class="status-fps">
@@ -381,8 +398,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- 4 Dòng Thông Số Tóm Tắt Gọn Gàng (Cỡ chữ 13.5px, căn lề trái-phải rõ ràng) -->
-    <div class="card-specs-bar" aria-label="Thông số kỹ thuật tóm tắt">
+    <div class="card-specs-bar" :aria-label="pick('Thông số kỹ thuật tóm tắt', 'Technical stack summary')">
       <div v-for="spec in specs" :key="spec.label" class="spec-row">
         <span class="spec-label">{{ spec.label }}</span>
         <strong
@@ -402,7 +418,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* 1 Khung Card Duy Nhất Bên Cột Phải: max-width 460px, height: auto, min-height: fit-content, overflow: visible */
 .hero-showcase-card {
   max-width: 460px;
   width: 100%;
@@ -413,16 +428,21 @@ onBeforeUnmount(() => {
   box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.75), 0 0 32px -16px rgba(6, 182, 212, 0.25);
   height: auto;
   min-height: fit-content;
-  overflow: visible;
+  overflow: hidden;
   font-family: 'JetBrains Mono', monospace;
   transition: border-color 200ms;
+}
+
+/* Light theme: softer shadow, visible border */
+[data-theme="light"] .hero-showcase-card {
+  border-color: rgba(30, 41, 59, 0.2);
+  box-shadow: 0 16px 48px -12px rgba(15, 23, 42, 0.25), 0 4px 16px -4px rgba(15, 23, 42, 0.1);
 }
 
 .hero-showcase-card:hover {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
-/* Chrome Window Bar */
 .card-chrome {
   display: flex;
   height: 38px;
@@ -453,7 +473,7 @@ onBeforeUnmount(() => {
 
 .card-filename {
   flex: 1;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.8125rem;
   color: #94a3b8;
   white-space: nowrap;
   overflow: hidden;
@@ -461,7 +481,7 @@ onBeforeUnmount(() => {
 }
 
 .card-mode-badge {
-  font-size: 0.75rem; /* 12px */
+  font-size: 0.75rem;
   font-weight: 700;
   border-radius: 9999px;
   padding: 2px 8px;
@@ -480,7 +500,6 @@ onBeforeUnmount(() => {
   color: #fbbf24;
 }
 
-/* Tab Switcher Bar */
 .card-tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -496,7 +515,7 @@ onBeforeUnmount(() => {
   gap: 7px;
   border-bottom: 2px solid transparent;
   color: #94a3b8;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.8125rem;
   font-weight: 600;
   background: transparent;
   cursor: pointer;
@@ -528,21 +547,19 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 
-/* Panel Area - Flexible height, no overflow hidden to prevent clipping */
 .card-panel {
   position: relative;
   height: auto;
   min-height: fit-content;
-  overflow: visible;
+  overflow: hidden;
 }
 
-/* TAB 1: Architecture Panel (Fullstack / High-Load) */
 .panel-architecture {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 10px;
-  padding: 12px 16px 18px; /* Tăng padding-bottom thoáng đãng */
+  padding: 12px 16px 18px;
   background: radial-gradient(ellipse at 85% 15%, rgba(245, 158, 11, 0.06), transparent 70%), #070c17;
   height: auto;
   min-height: fit-content;
@@ -553,9 +570,9 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.75rem; /* 12px */
-  color: #64748b;
-  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
   margin-bottom: 2px;
 }
 
@@ -568,7 +585,7 @@ onBeforeUnmount(() => {
   padding: 2.5px 8.5px;
   background: rgba(15, 23, 42, 0.8);
   color: #cbd5e1;
-  font-size: 0.75rem; /* 12px */
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 180ms ease;
 }
@@ -583,7 +600,6 @@ onBeforeUnmount(() => {
   cursor: default;
 }
 
-/* Flow Track: 4 Bước rõ ràng */
 .flow-track {
   display: flex;
   flex-direction: column;
@@ -637,14 +653,14 @@ onBeforeUnmount(() => {
 
 .flow-name {
   color: #f1f5f9;
-  font-size: 0.875rem; /* 14px */
+  font-size: 0.84rem;
   font-weight: 700;
   line-height: 1.3;
 }
 
 .flow-detail {
   color: #94a3b8;
-  font-size: 0.75rem; /* 12px */
+  font-size: 0.72rem;
   line-height: 1.3;
 }
 
@@ -677,21 +693,21 @@ onBeforeUnmount(() => {
   border-color: rgba(6, 182, 212, 0.35);
 }
 
-/* Architecture Metrics Proof Bar */
 .arch-metrics-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 10px;
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .pill-metric {
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 9999px;
   white-space: nowrap;
 }
@@ -708,7 +724,6 @@ onBeforeUnmount(() => {
   color: #38bdf8;
 }
 
-/* TAB 2: WebGIS Panel */
 .panel-webgis {
   height: 260px;
   background: #060b16;
@@ -734,7 +749,7 @@ onBeforeUnmount(() => {
 .canvas-tag {
   border-radius: 6px;
   padding: 3px 8px;
-  font-size: 0.75rem; /* 12px */
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
@@ -766,7 +781,7 @@ onBeforeUnmount(() => {
 }
 
 .status-hint {
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.8125rem;
   color: #cbd5e1;
   font-weight: 500;
 }
@@ -775,7 +790,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #34d399;
 }
@@ -793,37 +808,42 @@ onBeforeUnmount(() => {
   50% { opacity: 0.4; }
 }
 
-/* 4 Dòng Thông Số Tóm Tắt Gọn Gàng (Cỡ chữ 13.5px, căn lề trái-phải rõ ràng) */
 .card-specs-bar {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  padding: 12px 16px 14px;
+  padding: 10px 14px 12px;
   background: #0b1120;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom-left-radius: 1.15rem;
   border-bottom-right-radius: 1.15rem;
+  overflow: hidden;
 }
 
 .spec-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  font-size: 13.5px;
+  gap: 6px;
+  font-size: 12px;
   line-height: 1.45;
+  min-width: 0;
 }
 
 .spec-label {
   color: #94a3b8;
   font-weight: 500;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .spec-value {
   font-weight: 700;
   text-align: right;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 @media (max-width: 440px) {
@@ -832,4 +852,179 @@ onBeforeUnmount(() => {
     gap: 2px 8px;
   }
 }
+
+/* ========== LIGHT THEME OVERRIDES ========== */
+[data-theme="light"] .hero-showcase-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 8px 32px -8px rgba(15, 23, 42, 0.12), 0 2px 8px -2px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="light"] .hero-showcase-card:hover {
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .card-chrome {
+  background: #f8fafc;
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .card-filename {
+  color: #64748b;
+}
+
+[data-theme="light"] .card-mode-badge--amber {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #b45309;
+}
+
+[data-theme="light"] .card-mode-badge--cyan {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: #0e7490;
+}
+
+[data-theme="light"] .card-tabs {
+  background: #f1f5f9;
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .card-tabs button {
+  color: #64748b;
+}
+
+[data-theme="light"] .card-tabs button:hover {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .tab-btn--active-amber {
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #b45309 !important;
+}
+
+[data-theme="light"] .tab-btn--active-cyan {
+  background: rgba(6, 182, 212, 0.08) !important;
+  color: #0e7490 !important;
+}
+
+[data-theme="light"] .panel-architecture {
+  background: radial-gradient(ellipse at 85% 15%, rgba(245, 158, 11, 0.04), transparent 70%), #ffffff;
+}
+
+[data-theme="light"] .arch-header {
+  color: #64748b;
+}
+
+[data-theme="light"] .replay-btn {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+}
+
+[data-theme="light"] .replay-btn:hover {
+  border-color: #d97706;
+  color: #b45309;
+}
+
+[data-theme="light"] .flow-node {
+  border-color: #e2e8f0;
+  background: #ffffff;
+}
+
+[data-theme="light"] .flow-name {
+  color: #0f172a;
+}
+
+[data-theme="light"] .flow-detail {
+  color: #64748b;
+}
+
+[data-theme="light"] .flow-number {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .flow-connector {
+  color: #cbd5e1;
+}
+
+[data-theme="light"] .flow-icon {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #0891b2;
+}
+
+[data-theme="light"] .flow-step:nth-child(2) .flow-icon { color: #d97706; }
+[data-theme="light"] .flow-step:nth-child(3) .flow-icon { color: #9333ea; }
+[data-theme="light"] .flow-step:nth-child(4) .flow-icon { color: #059669; }
+
+[data-theme="light"] .flow-step--active .flow-node {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.06);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.1);
+}
+
+[data-theme="light"] .flow-step--active .flow-connector {
+  color: #d97706;
+}
+
+[data-theme="light"] .flow-step--visited .flow-node {
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+[data-theme="light"] .arch-metrics-bar {
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .pill-metric--amber {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #b45309;
+}
+
+[data-theme="light"] .pill-metric--cyan {
+  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(6, 182, 212, 0.25);
+  color: #0e7490;
+}
+
+[data-theme="light"] .panel-webgis {
+  background: #f8fafc;
+}
+
+[data-theme="light"] .canvas-tag--cyan {
+  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(6, 182, 212, 0.25);
+  color: #0e7490;
+}
+
+[data-theme="light"] .canvas-tag--amber {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #b45309;
+}
+
+[data-theme="light"] .canvas-status-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .status-hint {
+  color: #475569;
+}
+
+[data-theme="light"] .card-specs-bar {
+  background: #f8fafc;
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .spec-label {
+  color: #64748b;
+}
+
+[data-theme="light"] .spec-value.text-amber-400 { color: #b45309 !important; }
+[data-theme="light"] .spec-value.text-emerald-400 { color: #059669 !important; }
+[data-theme="light"] .spec-value.text-cyan-400 { color: #0e7490 !important; }
+[data-theme="light"] .spec-value.text-purple-400 { color: #7e22ce !important; }
 </style>

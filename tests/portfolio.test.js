@@ -141,7 +141,7 @@ test('project grouping does not mutate the source array or records in either bra
 
 test('both landing pages and both PC/mobile demo entries are retained without duplicated links', () => {
   assert.deepEqual(getProjectLinks(findProject('landing-pages')).map((link) => link.url), [
-    'https://omogieotrieumamxanh.vn/', 'https://athenacm.dev.vcadm.vn/',
+    'https://omogieotrieumamxanh.vn/', 'https://athenacm.vn/',
   ])
   const demos = getProjectLinks(findProject('maps'))
   assert.deepEqual(demos.map((link) => [link.url, link.desktopUrl, link.mobileUrl]), [
