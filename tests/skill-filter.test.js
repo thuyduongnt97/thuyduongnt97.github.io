@@ -25,7 +25,7 @@ test('skill selection and project filters share one state and restore every grou
     const expectedGroups = {
       webgis: ['spatial-maps'],
       webapp: ['template-widgets', 'core-box-features'],
-      adtech: ['adtech-tools', 'university-systems'],
+      adtech: ['adtech-tools', 'events-gamification', 'university-systems'],
       motion: ['core-box-features', 'campaigns-editorials', 'events-gamification'],
     }
     for (const [category, ids] of Object.entries(expectedGroups)) {
